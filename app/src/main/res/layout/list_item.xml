@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorPrimaryDark"
+    android:layout_width="match_parent"
+    android:descendantFocusability="blocksDescendants"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:id="@+id/alistitem"
+    android:weightSum="3">
+
+    <TextView
+        android:id="@+id/lblListItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="6dp"
+        android:layout_marginLeft="100dp"
+        android:textColor="@color/colorAccent"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/lblListItemDate"
+        android:gravity="top"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="@id/lblListItem"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/lblListItem"
+        android:layout_alignParentBottom="true"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:weightSum="3">
+        <Button
+            android:id="@+id/btnItemEdit"
+            android:background="@color/colorPrimary"
+            android:drawableLeft="@drawable/ic_mode_edit_black_24dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="35dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:layout_marginBottom="4dp"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:text="@string/edit"/>
+        <Button
+            android:id="@+id/btnItemDispose"
+            android:background="@color/colorPrimary"
+            android:drawableLeft="@drawable/ic_delete_black_24dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="35dp"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:text="@string/dispose"/>
+        <Button
+            android:id="@+id/btnItemDelete"
+            android:background="@color/colorPrimary"
+            android:drawableLeft="@drawable/ic_close_black_24dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:layout_width="0dip"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:text="@string/delete"/>
+
+
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
