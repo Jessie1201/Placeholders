@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -78,10 +79,57 @@
                 android:singleLine="true" />
 
         </android.support.design.widget.TextInputLayout>
+=======
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:windowSoftInputMode="stateVisible|adjustPan"
+    android:background="@drawable/loginscreen"
+    tools:context="com.pdp.orthex.fragmentedapplication.LoginActivity">
+
+    <!-- Login progress -->
+    <LinearLayout
+        android:id="@+id/email_login_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+    <View
+        android:layout_height="325dp"
+        android:layout_width="match_parent"
+        />
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="260dp"
+            android:layout_height="50dp"
+            android:text="valtteri.niutanen@gmail.com"
+            android:hint="@string/prompt_email"
+            android:inputType="textEmailAddress"
+            android:maxLines="1"
+            android:shadowColor="@color/colorPrimaryDark"
+            android:singleLine="true"
+            android:textAlignment="center" />
+
+        <EditText
+            android:id="@+id/password"
+            android:text="123456"
+            android:layout_width="240dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="24dp"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:maxLines="1"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:singleLine="true"
+            android:textAlignment="center" />
+>>>>>>> 0a6343b4693877fbb521f0c9e16fd6c9fd29500b
 
         <Button
             android:id="@+id/email_sign_in_button"
             style="?android:textAppearanceSmall"
+<<<<<<< HEAD
             android:shadowColor="@color/colorOBlue"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
@@ -98,3 +146,22 @@
 
     </LinearLayout>
 </RelativeLayout>
+=======
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginTop="12dp"
+            android:background="@android:color/transparent"
+            android:text=""
+            android:textStyle="bold" />
+
+    </LinearLayout>
+    <ProgressBar
+        android:id="@+id/login_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
+
+</android.support.constraint.ConstraintLayout>
+>>>>>>> 0a6343b4693877fbb521f0c9e16fd6c9fd29500b

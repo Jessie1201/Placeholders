@@ -43,7 +43,11 @@
         <Button
             android:id="@+id/btnItemEdit"
             android:background="@color/colorPrimary"
+<<<<<<< HEAD
             android:drawableLeft="@drawable/orthex_green_box"
+=======
+            android:drawableLeft="@drawable/ic_mode_edit_black_24dp"
+>>>>>>> 0a6343b4693877fbb521f0c9e16fd6c9fd29500b
             android:textColor="@color/colorPrimaryDark"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -57,7 +61,11 @@
         <Button
             android:id="@+id/btnItemDispose"
             android:background="@color/colorPrimary"
+<<<<<<< HEAD
             android:drawableLeft="@drawable/orthex_blue_box"
+=======
+            android:drawableLeft="@drawable/ic_delete_black_24dp"
+>>>>>>> 0a6343b4693877fbb521f0c9e16fd6c9fd29500b
             android:textColor="@color/colorPrimaryDark"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
@@ -70,7 +78,11 @@
         <Button
             android:id="@+id/btnItemDelete"
             android:background="@color/colorPrimary"
+<<<<<<< HEAD
             android:drawableLeft="@drawable/orthex_orange_box"
+=======
+            android:drawableLeft="@drawable/ic_close_black_24dp"
+>>>>>>> 0a6343b4693877fbb521f0c9e16fd6c9fd29500b
             android:textColor="@color/colorPrimaryDark"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"

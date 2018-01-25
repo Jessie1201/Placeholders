@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/Placeholders.iml" filepath="$PROJECT_DIR$/Placeholders.iml" />
+=======
+      <module fileurl="file://$PROJECT_DIR$/FragmentedApplication.iml" filepath="$PROJECT_DIR$/FragmentedApplication.iml" />
+>>>>>>> 0a6343b4693877fbb521f0c9e16fd6c9fd29500b
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

@@ -1,5 +1,6 @@
 <resources>
 
+<<<<<<< HEAD
 <!-- Base application theme. -->
 <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
     <!-- Customize your theme here. -->
@@ -20,4 +21,26 @@
     <item name="android:gravity">center</item>
     <item name="android:layout_margin">@dimen/activity_vertical_margin</item>
 </style>
+=======
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:spinnerItemStyle">@style/spinnerItemStyle</item>
+        <item name="android:spinnerDropDownItemStyle">
+            @style/spinnerDropDownItemStyle
+        </item>
+    </style>
+    <style name="spinnerItemStyle">
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">@dimen/activity_vertical_margin</item>
+    </style>
+
+    <style name="spinnerDropDownItemStyle">
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">@dimen/activity_vertical_margin</item>
+    </style>
+>>>>>>> 0a6343b4693877fbb521f0c9e16fd6c9fd29500b
 </resources>
