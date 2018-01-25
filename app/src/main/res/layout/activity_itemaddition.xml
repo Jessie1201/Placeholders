@@ -4,11 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-<<<<<<< HEAD
-    tools:context="com.pdp.orthex.placeholders.ItemadditionActivity">
-=======
-    tools:context="com.pdp.orthex.fragmentedapplication.ItemadditionActivity">
->>>>>>> 0a6343b4693877fbb521f0c9e16fd6c9fd29500b
+    tools:context="com.pdp.placeholders.ItemadditionActivity">
 
     <ImageView
         android:id="@+id/imageView"

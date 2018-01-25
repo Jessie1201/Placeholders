@@ -8,7 +8,6 @@
   "client": [
     {
       "client_info": {
-<<<<<<< HEAD
         "mobilesdk_app_id": "1:295773384039:android:5e83c1e89b83faf2",
         "android_client_info": {
           "package_name": "com.pdp.orthex.fragmentedapplication"
@@ -63,11 +62,6 @@
         "mobilesdk_app_id": "1:295773384039:android:1d389b3d59b17c9a",
         "android_client_info": {
           "package_name": "com.pdp.orthex.placeholders"
-=======
-        "mobilesdk_app_id": "1:295773384039:android:e60164eccb20e062",
-        "android_client_info": {
-          "package_name": "com.pdp.orthex"
->>>>>>> 0a6343b4693877fbb521f0c9e16fd6c9fd29500b
         }
       },
       "oauth_client": [
@@ -96,32 +90,15 @@
     },
     {
       "client_info": {
-<<<<<<< HEAD
         "mobilesdk_app_id": "1:295773384039:android:ffd2784f9aa624d3",
         "android_client_info": {
           "package_name": "pdp.placeholders"
-=======
-        "mobilesdk_app_id": "1:295773384039:android:5e83c1e89b83faf2",
-        "android_client_info": {
-          "package_name": "com.pdp.orthex.fragmentedapplication"
->>>>>>> 0a6343b4693877fbb521f0c9e16fd6c9fd29500b
         }
       },
       "oauth_client": [
         {
           "client_id": "295773384039-4hvnqjcck8n3tukce5hfh198sr8ds6an.apps.googleusercontent.com",
           "client_type": 3
-<<<<<<< HEAD
-=======
-        },
-        {
-          "client_id": "295773384039-2h3p3nqvm4r27v7aa39ln83a217o5dbs.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.pdp.orthex.fragmentedapplication",
-            "certificate_hash": "6fdb65c901c0e7d7b42e64023a054ce58ab018d0"
-          }
->>>>>>> 0a6343b4693877fbb521f0c9e16fd6c9fd29500b
         }
       ],
       "api_key": [
@@ -134,18 +111,8 @@
           "status": 1
         },
         "appinvite_service": {
-<<<<<<< HEAD
           "status": 1,
           "other_platform_oauth_client": []
-=======
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "295773384039-4hvnqjcck8n3tukce5hfh198sr8ds6an.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
->>>>>>> 0a6343b4693877fbb521f0c9e16fd6c9fd29500b
         },
         "ads_service": {
           "status": 2
