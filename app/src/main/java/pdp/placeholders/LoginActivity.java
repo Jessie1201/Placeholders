@@ -34,7 +34,7 @@ public class LoginActivity extends Activity {
 
     /**
      * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
+     * TODO: Add authentication to database.
      */
     private static final String TAG = "EmailPassword";
     private EditText mEmailView;
@@ -164,17 +164,16 @@ public class LoginActivity extends Activity {
         final String password = mPasswordView.getText().toString();
         AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
         builder
-                .setMessage("It seems that your account does not exist, do you want to sign up?")
-                .setPositiveButton("Sign me up Scotty", new DialogInterface.OnClickListener() {
+                .setMessage(R.string.signUpPrompt)
+                .setPositiveButton(R.string.signUpAccept, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         createAccount(email, password);
                     }
                 })
-                .setNegativeButton("Naww man", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.signUpDeny, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        return;
                     }
                 });
         builder.create().show();

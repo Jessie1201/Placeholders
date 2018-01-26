@@ -31,6 +31,10 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * Todo: add features: shopping list? Connect to box. Item location?
+ *
+ */
+/**
  * Combines for Does the same thing as the other main activity, Has less useless buttons */
 public class MainActivity extends Activity {
     private DatabaseReference mDatabase;
@@ -148,6 +152,13 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
+    /**
+     * Current issue: database only updates if:
+     *      something is removed (removes the old item only)
+     *      the list is empty (adds list correctly)
+     * Does not update existing lists.
+     Todo: Have database update correctly
+     */
     public void saveArrayList(){
         if(YourSingleton.getUserid()!=null){
             User user = new User(YourSingleton.getUserid(),
