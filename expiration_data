@@ -4,8 +4,16 @@ Margarine, 30
 Cottage Cheese, 5
 Cream Cheese, 7
 Hard Cheese, 21
+Natural Cheese, 30
+Processed Cheese, 30
 Egg Nog, 5
 Eggs, 21
+Raw Yolk, 2
+Hardcooked Eggs, 7
+Fresh Poultry, 2
+Poultry Stuffing, 1
+Poultry Pie, 1
+Poultry salad, 1
 Almond Milk, 5
 Buttermilk, 7
 Liquid Coffee Mate, 14
@@ -18,9 +26,9 @@ Sour Cream, 7
 Evaporated Milk, 3
 Ice Cream, 30
 Infant Formula, 1
-Milk Expiration, 5
-Powdered Milk, 4
-Pudding, 5
+Milk, 5
+Milk Powder, 730
+Pudding, 1
 Yogurt, 7
 Beer, 180
 Champagne, 1095
@@ -77,6 +85,7 @@ Fresh Limes, 30
 Cut Limes, 2
 Processed Limeade, 7
 Fresh Oranges, 30
+Citrus Fruits, 14
 Cut Oranges, 1
 Passion Fruits (Whole), 10
 Passion Fruits (Cut), 7
@@ -95,12 +104,13 @@ Fresh Whole Strawberries, 5
 Fresh Cut Strawberries, 1
 Fresh Tomatoes, 14
 Canned Tomatoes, 7
-Watermelon - Whole, 14
 Watermelon - Cut, 3
+Dried Fruit, 180
 Canned Vegetables, 7
+Fresh Corn, 1
 Canned Corn, 7
 Canned Soup, 7
-Asparagus, 5
+Asparagus, 3
 Fresh Broccoli, 7
 Cooked Broccoli, 7
 Fresh Carrots (Whole), 28
@@ -203,6 +213,8 @@ Stove Top Stuffing Mix, 180
 Prepared Stuffing, 4
 Homemade Stuffing, 4
 Flour Tortillas, 21
+Flour, 180
+Wheat, 180
 Corn Tortillas, 24
 Spinach Tortillas, 21
 Whole Wheat Tortillas, 21
@@ -213,6 +225,19 @@ Bean Sprouts, 3
 Hummus, 4
 Fresh Deli Meats, 5
 Packaged Lunch Meat, 7
+Fresh Roasts, 3
+Fresh Steaks, 3
+Fresh Chops, 3
+Fresh Livers Hearts Kidneys, 1
+Fresh Ground Meat, 1
+Stew Meat, 1
+Cooked Meat, 2
+Gravies made with Meat Stock, 2
+Meat Pies, 2
+Meat Stews, 2
+Meat Casseroles, 2
+Meat Salads, 2
+Hotdogs, 7
 Bologna, 7
 Salami (hard)*, 14
 Pepperoni, 14
@@ -221,10 +246,7 @@ Cooked Bacon, 7
 Bacon Bits, 42
 Beef or Steak, 7
 Ground Beef, 7
-Canned Beef (Opened), 7
 Corned Beef, 7
-Beef jerky, 365
-Turkey jerky, 365
 Homemade jerky, 60
 Spam, 7
 Canned Chicken, 5
@@ -232,14 +254,22 @@ Canned Tuna, 5
 Canned Corn Beef, 7
 Deviled Ham, 7
 Canned Clams, 5
+Crab, 7
 Ham, 7
 Hamburgers, 5
 Hot Dogs, 7
+Venison, 3
+Rabbit, 1
+Squirrel, 1
+Wild Duck, 1
+Pheasant, 1
+Goose, 1
 Cooked Pork Shoulder/Loin/Chops/Sausage, 7
 Chia Meal, 14
 Chia Gel, 0.1
 Flax Meal, 60
 Almonds, 270
+Shelled Nuts, 180
 Brazil Nuts, 270
 Cashews, 180
 Hazelnuts, 120
@@ -269,7 +299,10 @@ Halibut, 1
 Ono, 1
 Tilapia, 1
 Catfish, 1
-Cooked Fish, 5
+Cooked Fish, 3
+Fresh Fish, 1
+Smoked Fish, 10
+Dried or pickled Fish, 21
 Smoked Salmon, 5
 Canned Tuna, 5
 Sardines, 5
