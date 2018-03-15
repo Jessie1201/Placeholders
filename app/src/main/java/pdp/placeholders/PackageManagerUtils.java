@@ -10,7 +10,9 @@ import com.google.common.io.BaseEncoding;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/**
+/**This is used to authenticate the application so it can access Firebase - database
+ * reference:  https://firebase.google.com/docs/android/setup
+ *
  * Provides utility logic for getting the app's SHA1 signature. Used with restricted API keys.
  * In this app, it is used for the Firebase live database
  *

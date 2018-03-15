@@ -2,6 +2,8 @@ package pdp.placeholders;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -13,14 +15,23 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * A login screen that offers login via email/password.
@@ -30,7 +41,6 @@ public class LoginActivity extends Activity {
     /**
      * Id to identity READ_CONTACTS permission request.
      */
-
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -45,12 +55,31 @@ public class LoginActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        SharedPreferences sprefs = getSharedPreferences("userprefs",MODE_PRIVATE);
+
+        if(sprefs.contains("username")){
+            UserItems.setUsername(sprefs.getString("username",null));
+            UserItems.setUserId(sprefs.getString("userid",null));
+            ArrayList<String> list1 = new ArrayList<>(sprefs.getStringSet("userlist",null));
+            FirebaseHelper.getArrayList(this,MainActivity.class);
+        }
+
+        if(UserItems.getUserid()!=null){
+            Intent mIntent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(mIntent);
+            finish();
+        }
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mAuth = FirebaseAuth.getInstance();
-        mEmailView = (EditText) findViewById(R.id.email);
 
+        mEmailView = (EditText) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
+        mProgressView = findViewById(R.id.login_progress);
+
+        mEmailView.setText("new@new.com");
+        mPasswordView.setText("123456");
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -69,20 +98,24 @@ public class LoginActivity extends Activity {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 String email = mEmailView.getText().toString();
                 String password = mPasswordView.getText().toString();
+                mProgressView.setVisibility(View.VISIBLE);
+                Toast.makeText(LoginActivity.this, "Authenticating", Toast.LENGTH_SHORT).show();
+
                 signIn(email, password);
+
             }
         });
 
-        mProgressView = findViewById(R.id.login_progress);
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        //updateUI(currentUser);
     }
 
     private boolean validateForm() {
@@ -121,18 +154,24 @@ public class LoginActivity extends Activity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "createUserWithEmail:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
+                            Toast.makeText(LoginActivity.this,"Creating account",Toast.LENGTH_SHORT).show();
+                            UserItems.setUserId(user.getUid());
+                            UserItems.setUsername(mEmailView.getText().toString());
+                            UserItems.getInstance().addToList("remove this after adding new item;/;2018-01-10;/;2018-01-10");
+                            FirebaseHelper.saveArrayList();
+                            FirebaseHelper.getArrayList(LoginActivity.this,MainActivity.class);
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(LoginActivity.this, "createUserEmail failed",
+                            Toast.makeText(LoginActivity.this, "createUserWithEmail failed",
                                     Toast.LENGTH_SHORT).show();
-                            updateUI(null);
                         }
                     }
                 });
         // [END create_user_with_email]
     }
+
     private void signIn(String email, String password){
         if(isEmailValid(email) && isPasswordValid(password)) {
             mAuth.signInWithEmailAndPassword(email, password)
@@ -143,20 +182,25 @@ public class LoginActivity extends Activity {
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "signInWithEmail:success");
                                 FirebaseUser user = mAuth.getCurrentUser();
-                                updateUI(user);
+                                UserItems.setUserId(user.getUid());
+                                UserItems.setUsername(mEmailView.getText().toString());
+                                mProgressView.setVisibility(View.GONE);
+                                FirebaseHelper.getArrayList(LoginActivity.this,MainActivity.class);
+
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "signInWithEmail:failure", task.getException());
                                 Toast.makeText(LoginActivity.this, "Authentication failed.",
                                         Toast.LENGTH_SHORT).show();
                                 signupDialog();
-                                updateUI(null);
+                                mProgressView.setVisibility(View.GONE);
                             }
                         }
                     });
         } else {
             Toast.makeText(LoginActivity.this, "Email and/or password not valid",
                     Toast.LENGTH_SHORT).show();
+            mProgressView.setVisibility(View.GONE);
         }
     }
     private void signupDialog(){
@@ -179,28 +223,21 @@ public class LoginActivity extends Activity {
         builder.create().show();
     }
 
-    private void updateUI(FirebaseUser user) {
-        mProgressView.setVisibility(View.GONE);
-        if (user != null) {
-            String useruid= user.getUid();
-            YourSingleton.setUserId(useruid);
-            YourSingleton.setUsername(mEmailView.getText().toString());
-            //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            //startActivity(intent);
-            finish();
-        }
-    }
+
 
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
+        // Replace this with your own logic
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
+        // Replace this with your own logic
         return password.length() >= 0;
     }
+
+
+
 
 }
 

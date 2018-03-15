@@ -4,18 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.pdp.placeholders.ItemadditionActivity">
+    tools:context="pdp.placeholders.ItemadditionActivity">
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:alpha="0.4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:alpha="0.4"
         app:layout_constraintVertical_bias="0.0" />
 
     <TextView
@@ -45,7 +45,10 @@
         android:id="@+id/progressbar"
         style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="match_parent"
+        app:layout_constraintTop_toTopOf="@+id/ETitemName"
         android:layout_height="48dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         android:layout_centerInParent="true"
         android:visibility="gone"
         tools:layout_editor_absoluteX="4dp"
@@ -66,6 +69,21 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ETitemName" />
+
+    <Spinner
+        android:id="@+id/targetbox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:textAlignment="center"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/targettime" />
 
     <Button
         android:id="@+id/btnDone" android:text="@string/done_button"

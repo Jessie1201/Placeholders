@@ -8,28 +8,52 @@
     tools:context="pdp.placeholders.MainActivity">
 
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:clickable="false"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme">
+
+        <ImageView
+            android:id="@+id/UserPicture"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/orthex_green_box" />
+
+        <TextView
+            android:id="@+id/UserNameText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:text="asdfasdf"
+            android:contextClickable="true"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            tools:layout_editor_absoluteX="36dp"
+            tools:layout_editor_absoluteY="19dp" />
+    </android.support.v7.widget.Toolbar>
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btnadditem2"
-        android:layout_width="138dp"
-        android:layout_height="104dp"
-        android:layout_marginBottom="28dp"
-        android:layout_marginRight="28dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginRight="32dp"
         android:clickable="true"
-        android:src="@android:drawable/ic_input_add"
+        android:src="@android:drawable/ic_menu_add"
+        app:backgroundTint="@color/colorOBlue"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar2"
         android:orientation="vertical">
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/my_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">

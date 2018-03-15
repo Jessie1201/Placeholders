@@ -42,6 +42,7 @@ import com.google.api.services.vision.v1.model.Image;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -49,7 +50,8 @@ import java.util.List;
 import java.util.Locale;
 
 /** This activity performs the addition of new items.
- *  It uses Cloud Vision api for the images, otherwise it just adds items to the singleton list.
+ It uses Cloud Vision api for the images, otherwise it just adds items to the singleton list.
+ Further reading: https://cloud.google.com/vision/docs/detecting-labels#vision-label-detection-java
  * */
 
 public class ItemadditionActivity extends AppCompatActivity {
@@ -68,6 +70,7 @@ public class ItemadditionActivity extends AppCompatActivity {
     private EditText ETlabel;
     private TextView textview;
 
+    // TODO: 13.3.2018 create assign box option
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,15 +83,30 @@ public class ItemadditionActivity extends AppCompatActivity {
 
         //Creates the time dropdown menu options
         String[] SpinnerList ={getString(R.string.short_term), getString(R.string.medium_term), getString(R.string.long_term)};
+        Object[] boxes =UserItems.getInstance().getBoxes().keySet().toArray();
+        ArrayList<String> trimboxes =new ArrayList<>();
+        trimboxes.add("no box");
+        for (Object box:boxes){
+            trimboxes.add(box.toString());
+        }
+        trimboxes.add("New Box");
+        String[] trimbox = trimboxes.toArray(new String[0]);
+        ArrayAdapter<String> boxadapter = new ArrayAdapter<String>(this,R.layout.my_spinner_style, trimbox);
+        boxadapter.setDropDownViewResource(R.layout.my_spinner_style);
+        final Spinner boxSpinner = (Spinner)findViewById(R.id.targetbox);
+        boxSpinner.setAdapter(boxadapter);
+
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.my_spinner_style,SpinnerList);
         adapter.setDropDownViewResource(R.layout.my_spinner_style);
         final Spinner termSpinner = (Spinner)findViewById(R.id.targettime);
         termSpinner.setAdapter(adapter);
+
+
         Button btnNextItem = (Button)findViewById(R.id.btnNextItem);
         btnNextItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addItemToList(termSpinner);
+                addItemToList(termSpinner,boxSpinner);
                 ETlabel.setText("");
                 mMainImage.setImageResource(android.R.color.transparent);
             }
@@ -106,14 +124,14 @@ public class ItemadditionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(ETlabel.getText()!=null){
-                    addItemToList(termSpinner);}
+                    addItemToList(termSpinner, boxSpinner);}
                 finish();
             }
         });
         //galleryOrCamera();
     }
     // Adds item to the singleton list
-    private void addItemToList(Spinner termSpinner) {
+    private void addItemToList(Spinner termSpinner, Spinner boxSpinner) {
         String itemstring = ETlabel.getText().toString();
         if (itemstring.trim().length() > 0) {
             Calendar c = Calendar.getInstance();
@@ -127,10 +145,17 @@ public class ItemadditionActivity extends AppCompatActivity {
             if (termSpinner.getSelectedItem().toString() == getString(R.string.long_term)) {
                 c.add(Calendar.DATE, 364);
             }
+            /*if(boxSpinner.getSelectedItem().toString() != "no box"){
+                int a = boxSpinner.getSelectedItemPosition()-1;
+                SimpleDateFormat formatter = new SimpleDateFormat("yyy-MM-dd");
+                String d = formatter.format(c.getTime());
+                UserItems.getInstance().removeBox(a);
+                UserItems.getInstance().addBox(boxSpinner.getSelectedItem().toString(), itemstring, d,"update");
+            }*/
             Calendar currentDate = Calendar.getInstance(); currentDate.setTime(new Date());
-            String itemString= YourSingleton.newItemInputs(itemstring, c, currentDate);
-            YourSingleton.getInstance().addToArray(itemString);
-            Toast.makeText(getApplicationContext(), "Item has been added", Toast.LENGTH_LONG).show();
+            UserItems.addToList(itemstring, c, currentDate);
+
+            Toast.makeText(getApplicationContext(),"Item Added", Toast.LENGTH_LONG).show();
         }
     }
     // Creates the prompt when picking an image
@@ -172,8 +197,8 @@ public class ItemadditionActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivityForResult(intent, CAMERA_IMAGE_REQUEST);
         } //once done moves to onActivityResult to get picture
-
     }
+
     public void onRequestPermissionsResult( //makes sure  that it does not crash if permissions do not exist
             int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -241,7 +266,9 @@ public class ItemadditionActivity extends AppCompatActivity {
             Toast.makeText(this, R.string.image_picker_error, Toast.LENGTH_LONG).show();
         }
     }
-    /** Scales down the image that needs to be sent. */
+    /** Scales down the image that needs to be sent.
+     The rest of this file is for the computer vision
+     */
     public Bitmap scaleBitmapDown(Bitmap bitmap, int maxDimension) {
         //Makes sure picture is right size for google vision api
         int originalWidth = bitmap.getWidth();

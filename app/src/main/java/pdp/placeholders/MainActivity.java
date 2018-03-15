@@ -1,11 +1,16 @@
 package pdp.placeholders;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
-import android.util.Log;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -15,32 +20,39 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
+// This activity makes the List of items, and displays them
 /**
- * Todo: add features: shopping list? Connect to box. Item location?
+ * Todo: Create set up box activity
  *
  */
-/**
- * Combines for Does the same thing as the other main activity, Has less useless buttons */
 public class MainActivity extends Activity {
-    private DatabaseReference mDatabase;
+    //This defines the view items that are in the layout
     private ExpandableListView itemlist;
     private ExpandableListAdapter listAdapter;
     private List<String> listDataHeader;
+    private TextView UserNameText;
     private HashMap<String, List<String>> listHash;
     public static final int TAG_NAME = ExpandableListAdapter.TAG_NAME;
     public static final int TAG_DATE = ExpandableListAdapter.TAG_DATE;
@@ -48,20 +60,51 @@ public class MainActivity extends Activity {
     public static final int TAG_DISPOSE = ExpandableListAdapter.TAG_DISPOSE;
     public static final int TAG_EDIT = ExpandableListAdapter.TAG_EDIT;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState == null) {}
-        mDatabase = FirebaseDatabase.getInstance().getReference("users");
-        if (YourSingleton.getInstance().getArray().size()>=1){
-            saveArrayList();
-        }
-        getArrayList();
         setContentView(R.layout.activity_main);
-        if(YourSingleton.getUserid()==null){
-            Intent loginIntent = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivity(loginIntent);
-        }
+
+        //This part creates a "job" that is taken care of in the ShowNotificationJob
+        ComponentName componentName = new ComponentName(this,ShowNotificationJob.class);
+        final int notificationID = 3478916;
+        JobInfo.Builder builder = new JobInfo.Builder(notificationID+1,componentName);
+        builder.setPeriodic(TimeUnit.DAYS.toMillis(1));
+        builder.setPersisted(true);
+        JobScheduler jbSched; JobInfo jobInfo; jobInfo = builder.build();
+        jbSched = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
+        jbSched.schedule(jobInfo);
+        
+        // Adds a button to the top part
+        UserNameText =(TextView)findViewById(R.id.UserNameText);
+        UserNameText.setText(UserItems.getUsername());
+        UserNameText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Creates popup to ask if you actually want to log out
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder
+                        .setMessage(R.string.logoutText)
+                        .setPositiveButton(R.string.signUpAccept, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                UserItems.clearUser();
+                                Toast.makeText(MainActivity.this, "You have been logged out", Toast.LENGTH_SHORT).show();
+                                Intent loginIntent = new Intent(getApplicationContext(), LoginActivity.class);
+                                startActivity(loginIntent);
+                                finish();
+                            }
+                        })
+                        .setNegativeButton(R.string.signUpDeny, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+                builder.create().show();
+            }
+        });
+        //creates the floating button
         FloatingActionButton btnAddItem = (FloatingActionButton)findViewById(R.id.btnadditem2);
         btnAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,32 +120,23 @@ public class MainActivity extends Activity {
             window.setStatusBarColor(this.getResources().getColor(R.color.colorPrimary));
         }
     }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
+    
     @Override
     protected void onResume() {
         super.onResume();
+        FirebaseHelper.getArrayList(null,null);
         refreshFragment();
+        if(UserItems.getUserid()==null){
+            Intent loginIntent = new Intent(getApplicationContext(), LoginActivity.class);
+            startActivity(loginIntent);
+        }
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        saveArrayList();
-    }
-
 
     private void refreshFragment() {
+        //Creates the list, and a button for each item
         itemlist = (ExpandableListView)findViewById(R.id.expndlist);
-        //itemlist.setVisibility(View.GONE);
-        //itemlist.setVisibility(View.VISIBLE);
-        getArrayList();
         itemlist.setChildDivider(getResources().getDrawable(R.color.colorPrimaryDark));
-        initData();
+        initData(UserItems.getInstance().getList());
         listAdapter = new ExpandableListAdapter(getApplicationContext(), listDataHeader,listHash);
         itemlist.setAdapter(listAdapter);
         itemlist.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
@@ -120,11 +154,17 @@ public class MainActivity extends Activity {
                     btnItemDelete.setVisibility(View.VISIBLE);
                     btnItemDispose.setVisibility(View.VISIBLE);
                     btnItemEdit.setVisibility(View.VISIBLE);
+                    btnItemDispose.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            btnItemDispose.setBackgroundColor(getResources().getColor(R.color.colorOGreen));
+                        }
+                    });
                     btnItemDelete.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             Object item = listAdapter.getChild(groupPosition, childPosition);
-                            YourSingleton.removeFromArray(item);
+                            UserItems.removeItem(item.toString());
                             btnItemDelete.setText("Gone");
                             btnItemDelete.setBackgroundColor(getResources().getColor(R.color.colorOGreen));
                             btnItemDelete.setVisibility(View.GONE);
@@ -133,7 +173,6 @@ public class MainActivity extends Activity {
                             itemName.setVisibility(View.GONE);
                             itemDate.setVisibility(View.GONE);
 
-                            //refreshFragment();
                         }
                     });
                     //params.height = a + params2.height;
@@ -152,33 +191,31 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
-    /**
-     * Current issue: database only updates if:
-     *      something is removed (removes the old item only)
-     *      the list is empty (adds list correctly)
-     * Does not update existing lists.
-     Todo: Have database update correctly
-     */
-    public void saveArrayList(){
-        if(YourSingleton.getUserid()!=null){
-            User user = new User(YourSingleton.getUserid(),
-                    YourSingleton.getUsername(), YourSingleton.getInstance().getArray());
-            String key1 = YourSingleton.getUserid();
-            mDatabase.child(key1).setValue(user);
-        }
-    }
-    private void initData(){
+    // TODO: 13.3.2018 create box layout and a new box activity
+    // TODO: 13.3.2018 wifi credentials pass through
+
+
+    private void initData(List<String> itmlist){
+        //creates the sublists for the subgroups
         listDataHeader = new ArrayList<>();
         listHash = new HashMap<>();
         listDataHeader.add("Short term products");
         listDataHeader.add("Medium term products");
         listDataHeader.add("Long term products");
-        List<String> itmlist = YourSingleton.getInstance().getArray(); //creates list of items
+        listDataHeader.add("Boxes");
+
         List<String> shrtTerm = new ArrayList<>(); //creates different sections
         List<String> mdmTerm = new ArrayList<>();
         List<String> lngTerm = new ArrayList<>();
+        List<String> boxTerm = new ArrayList<>();
+
+        HashMap<String,User.Box> BoxesSorted =UserItems.getBoxes();
+        Object[] array = BoxesSorted.keySet().toArray();
+        for(Object item:array){boxTerm.add(item.toString()+" - "
+                +BoxesSorted.get(item).itemname+UserItems.itemListDelimiter+BoxesSorted.get(item).expiration);}
+
         for(String item : itmlist){  //goes through list and adds them to appropriate section
-            String[] txt1 = YourSingleton.getItemInfo(item);
+            String[] txt1 = item.replace(UserItems.BoxDelimiter,UserItems.itemListDelimiter).split(UserItems.itemListDelimiter);
             String txtdate = txt1[1];
             try {
                 DateFormat formatter = new SimpleDateFormat("yyy-MM-dd");
@@ -195,48 +232,30 @@ public class MainActivity extends Activity {
         if (shrtTerm.size()==0)shrtTerm.add("No Items Yet");
         if (mdmTerm.size()==0)mdmTerm.add("No Items Yet");
         if (lngTerm.size()==0)lngTerm.add("No Items Yet");
+        if (boxTerm.size()==0)boxTerm.add("No Items Yet");
 
         listHash.put(listDataHeader.get(0),shrtTerm);
         listHash.put(listDataHeader.get(1),mdmTerm);
         listHash.put(listDataHeader.get(2),lngTerm);
+        listHash.put(listDataHeader.get(3),boxTerm);
 
     }
 
-    public void getArrayList(){
-        try{
-        final String userId = YourSingleton.getUserid();
-        mDatabase.child(userId).child("userlist").addValueEventListener(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        // Get user list
-                        ArrayList<String> list1= new ArrayList<>();
-                        for(DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                            list1.add((String) postSnapshot.getValue());
-                        }
-                        Object value = dataSnapshot.getValue();
-                        // [START_EXCLUDE]
-                        if (value == null) {
-                            // User is null, error out
-                            Log.e(userId, "User " + userId + " is unexpectedly null");
-                            Toast.makeText(MainActivity.this,
-                                    "Error: could not fetch user.",
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            YourSingleton.getInstance().replaceArray(list1);
-                            saveArrayList();
-                        }
-                    }
+    @Override
+    protected void onPause() {
+        super.onPause();
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.w("does it matter", "getUser:onCancelled", databaseError.toException());
-                    }
-                }
-        );}
-        catch (NullPointerException e) { saveArrayList();
-
+        SharedPreferences.Editor sprefs = getSharedPreferences("userprefs", MODE_PRIVATE).edit();
+        sprefs.putString("username",UserItems.getUsername());
+        sprefs.putString("userid",UserItems.getUserid());
+        if ( UserItems.username==null){
+            sprefs.putStringSet("userlist",null);
+            sprefs.putStringSet("boxlist", null);
+        }else{
+            Set<String> listset = new HashSet<String>(UserItems.getInstance().getList());
+            sprefs.putStringSet("userlist",listset);
         }
-        // [END single_value_read]
+            sprefs.apply();
     }
+
 }

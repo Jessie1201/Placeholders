@@ -1,3 +1,5 @@
+/**This uses google's prompt when user needs to grant permissions
+ */
 /*
  * Copyright 2016 Google Inc. All Rights Reserved.
  *

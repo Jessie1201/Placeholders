@@ -22,6 +22,9 @@ import java.util.List;
  This file helps create the ExpandableList in the main activity.
  Most of the functions are from other examples.
  The parts that are special for this app are: getGroupView  and  getChildView
+ Further reading: https://developer.android.com/reference/android/widget/ExpandableListView.html
+ I followed this video: https://www.youtube.com/watch?v=jZxZIFnJ9jE
+
  */
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
@@ -110,7 +113,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         /*     Each stored item is saved as a string in the following format:
          *      item name;/; date expires ;/; date added
          *      txt1 is the array that you get when you split the data with ;/; */
-        String[] txt1 = YourSingleton.getItemInfo(childText);
+        String[] txt1 =childText.replace(UserItems.BoxDelimiter," - ").split(UserItems.itemListDelimiter);
         int a = txt1.length;
         // Gets the layout resource for the child item
         if(convertView==null){
