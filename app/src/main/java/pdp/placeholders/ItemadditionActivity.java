@@ -81,6 +81,7 @@ public class ItemadditionActivity extends AppCompatActivity {
         mMainImage = (ImageView) findViewById(R.id.imageView);
         textview = (TextView)findViewById(R.id.textviewhelper);
 
+        // TODO: 15.3.2018 create a search after user inputs item name 
         //Creates the time dropdown menu options
         String[] SpinnerList ={getString(R.string.short_term), getString(R.string.medium_term), getString(R.string.long_term)};
         Object[] boxes =UserItems.getInstance().getBoxes().keySet().toArray();
@@ -131,6 +132,7 @@ public class ItemadditionActivity extends AppCompatActivity {
         //galleryOrCamera();
     }
     // Adds item to the singleton list
+    // TODO: 15.3.2018 Change the date option into something more custommizable 
     private void addItemToList(Spinner termSpinner, Spinner boxSpinner) {
         String itemstring = ETlabel.getText().toString();
         if (itemstring.trim().length() > 0) {
