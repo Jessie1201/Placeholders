@@ -8,65 +8,109 @@
     tools:context="pdp.placeholders.MainActivity">
 
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:clickable="false"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme">
-
-        <ImageView
-            android:id="@+id/UserPicture"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:background="@drawable/orthex_green_box" />
-
-        <TextView
-            android:id="@+id/UserNameText"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clickable="true"
-            android:text="asdfasdf"
-            android:contextClickable="true"
-            android:gravity="center_vertical"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            tools:layout_editor_absoluteX="36dp"
-            tools:layout_editor_absoluteY="19dp" />
-    </android.support.v7.widget.Toolbar>
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btnadditem2"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginBottom="24dp"
-        android:layout_marginRight="32dp"
+        android:layout_marginRight="24dp"
         android:clickable="true"
-        android:src="@android:drawable/ic_menu_add"
-        app:backgroundTint="@color/colorOBlue"
+        android:src="@drawable/ic_add_food_button"
+        android:scaleType="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar2"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <LinearLayout
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar2"
+            android:background="#F2F7F8"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <ExpandableListView
-                android:id="@+id/expndlist"
+            android:layout_height="55dp"
+            android:clickable="false"
+            android:minHeight="50dp">
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:childDivider="@color/colorAccent"
-                android:clipToPadding="false" />
-        </LinearLayout>
+                android:layout_height="match_parent"
+                >
+                <ImageView
+                    android:id="@+id/UserPicture"
+                    android:layout_centerVertical="true"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_app_symbol"
+                    android:background="@drawable/orthex_blue_box" />
 
+                <TextView
+                    android:id="@+id/UserNameText"
+                    android:layout_toRightOf="@id/UserPicture"
+                    android:padding="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:clickable="true"
+                    android:contextClickable="true"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:text="@string/app_name"/>
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/ic_icon_add_box"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_alignParentRight="true"
+                    />
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.Toolbar>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Your food"
+            android:textSize="35sp" />
+
+        <Switch
+            android:id="@+id/switch1"
+            android:thumb="@drawable/customswitch"
+            android:track="@drawable/customswitchbg"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="-10dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:text="Expiring products" />
+
+
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/itemRecycleview"/>
+
+        <ExpandableListView
+            android:id="@+id/expndlist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:childDivider="@color/colorAccent"
+            android:clipToPadding="false" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_illustration_empty_state"
+            android:id="@+id/noItemsImage"/>
     </LinearLayout>
+
+
 
 </android.support.constraint.ConstraintLayout>

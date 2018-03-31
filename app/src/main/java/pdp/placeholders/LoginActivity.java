@@ -15,6 +15,7 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -25,6 +26,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+
+import org.apache.http.protocol.HTTP;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -49,15 +52,15 @@ public class LoginActivity extends Activity {
     private static final String TAG = "EmailPassword";
     private EditText mEmailView;
     private EditText mPasswordView;
-    private View mProgressView;
+    private ProgressBar mProgressView;
     private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Checks if there are any saved users on the phone
         SharedPreferences sprefs = getSharedPreferences("userprefs",MODE_PRIVATE);
-
         if(sprefs.contains("username")){
             UserItems.setUsername(sprefs.getString("username",null));
             UserItems.setUserId(sprefs.getString("userid",null));
@@ -87,7 +90,6 @@ public class LoginActivity extends Activity {
                     final String email = mEmailView.getText().toString();
                     final String password = mPasswordView.getText().toString();
                     signIn(email, password);
-
                     return true;
                 }
                 return false;
@@ -98,10 +100,8 @@ public class LoginActivity extends Activity {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 String email = mEmailView.getText().toString();
                 String password = mPasswordView.getText().toString();
-                mProgressView.setVisibility(View.VISIBLE);
                 Toast.makeText(LoginActivity.this, "Authenticating", Toast.LENGTH_SHORT).show();
 
                 signIn(email, password);
@@ -173,6 +173,7 @@ public class LoginActivity extends Activity {
     }
 
     private void signIn(String email, String password){
+        mProgressView.setVisibility(View.VISIBLE);
         if(isEmailValid(email) && isPasswordValid(password)) {
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {

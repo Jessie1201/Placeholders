@@ -9,6 +9,9 @@
         <item name="android:spinnerDropDownItemStyle">
         </item>
     </style>
+    <style name="my_time_picker_style">
+        <item name="android:textSize">24dp</item>
+    </style>
     <style name="spinnerItemStyle">
         <item name="android:gravity">center</item>
         <item name="android:layout_margin">@dimen/activity_vertical_margin</item>

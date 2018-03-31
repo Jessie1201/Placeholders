@@ -1,11 +1,16 @@
 package pdp.placeholders;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -15,15 +20,16 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.HttpTransport;
@@ -38,11 +44,11 @@ import com.google.api.services.vision.v1.model.BatchAnnotateImagesResponse;
 import com.google.api.services.vision.v1.model.EntityAnnotation;
 import com.google.api.services.vision.v1.model.Feature;
 import com.google.api.services.vision.v1.model.Image;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -69,17 +75,25 @@ public class ItemadditionActivity extends AppCompatActivity {
     private ImageView mMainImage;
     private EditText ETlabel;
     private TextView textview;
+    private WifiReceiver receiverWifi;
+    private static final int PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION = 1001;
+    int netId;
+    DatePicker datePicker;
+
 
     // TODO: 13.3.2018 create assign box option
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        receiverWifi= new WifiReceiver();
+        WifiManager wifimanager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_itemaddition);
         mProgressBar = (ProgressBar)findViewById(R.id.progressbar);
         ETlabel = (EditText)findViewById(R.id.ETitemName);
         mMainImage = (ImageView) findViewById(R.id.imageView);
         textview = (TextView)findViewById(R.id.textviewhelper);
+        datePicker = (DatePicker)findViewById(R.id.datePicker2);
 
         // TODO: 15.3.2018 create a search after user inputs item name 
         //Creates the time dropdown menu options
@@ -91,7 +105,7 @@ public class ItemadditionActivity extends AppCompatActivity {
             trimboxes.add(box.toString());
         }
         trimboxes.add("New Box");
-        String[] trimbox = trimboxes.toArray(new String[0]);
+        final String[] trimbox = trimboxes.toArray(new String[0]);
         ArrayAdapter<String> boxadapter = new ArrayAdapter<String>(this,R.layout.my_spinner_style, trimbox);
         boxadapter.setDropDownViewResource(R.layout.my_spinner_style);
         final Spinner boxSpinner = (Spinner)findViewById(R.id.targetbox);
@@ -99,15 +113,50 @@ public class ItemadditionActivity extends AppCompatActivity {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.my_spinner_style,SpinnerList);
         adapter.setDropDownViewResource(R.layout.my_spinner_style);
-        final Spinner termSpinner = (Spinner)findViewById(R.id.targettime);
-        termSpinner.setAdapter(adapter);
+        boxSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position==trimbox.length-1){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ItemadditionActivity.this);
+                    builder
+                            .setMessage(R.string.dialog_createbox)
+                            .setPositiveButton(R.string.signUpAccept, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                                                PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION);
+                                        //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
 
+                                    }else{
+                                        WifiManager wifimanager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                                        registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+                                        wifimanager.startScan();
+                                    }
+
+                                }
+                            })
+                            .setNegativeButton(R.string.signUpDeny, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    boxSpinner.setSelection(0);
+                                }
+                            });
+                    builder.create().show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         Button btnNextItem = (Button)findViewById(R.id.btnNextItem);
         btnNextItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addItemToList(termSpinner,boxSpinner);
+                addItemToList(boxSpinner);
                 ETlabel.setText("");
                 mMainImage.setImageResource(android.R.color.transparent);
             }
@@ -125,40 +174,11 @@ public class ItemadditionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(ETlabel.getText()!=null){
-                    addItemToList(termSpinner, boxSpinner);}
+                    addItemToList(boxSpinner);}
                 finish();
             }
         });
         //galleryOrCamera();
-    }
-    // Adds item to the singleton list
-    // TODO: 15.3.2018 Change the date option into something more custommizable 
-    private void addItemToList(Spinner termSpinner, Spinner boxSpinner) {
-        String itemstring = ETlabel.getText().toString();
-        if (itemstring.trim().length() > 0) {
-            Calendar c = Calendar.getInstance();
-            c.setTime(new Date());
-            if (termSpinner.getSelectedItem().toString() == getString(R.string.short_term)) {
-                c.add(Calendar.DATE, 7);
-            }
-            if (termSpinner.getSelectedItem().toString() == getString(R.string.medium_term)) {
-                c.add(Calendar.DATE, 30);
-            }
-            if (termSpinner.getSelectedItem().toString() == getString(R.string.long_term)) {
-                c.add(Calendar.DATE, 364);
-            }
-            /*if(boxSpinner.getSelectedItem().toString() != "no box"){
-                int a = boxSpinner.getSelectedItemPosition()-1;
-                SimpleDateFormat formatter = new SimpleDateFormat("yyy-MM-dd");
-                String d = formatter.format(c.getTime());
-                UserItems.getInstance().removeBox(a);
-                UserItems.getInstance().addBox(boxSpinner.getSelectedItem().toString(), itemstring, d,"update");
-            }*/
-            Calendar currentDate = Calendar.getInstance(); currentDate.setTime(new Date());
-            UserItems.addToList(itemstring, c, currentDate);
-
-            Toast.makeText(getApplicationContext(),"Item Added", Toast.LENGTH_LONG).show();
-        }
     }
     // Creates the prompt when picking an image
     private void galleryOrCamera() { //creates a popup asking gallery or camera
@@ -178,6 +198,26 @@ public class ItemadditionActivity extends AppCompatActivity {
                     }
                 });
         builder.create().show();
+    }
+    // Adds item to the singleton list
+    // TODO: 15.3.2018 Change the date option into something more custommizable
+    private void addItemToList(Spinner boxSpinner) {
+        String itemstring = ETlabel.getText().toString();
+        if (itemstring.trim().length() > 0) {
+            // TODO: 24.3.2018 replace if statements with values from datepicker
+            Calendar c = Calendar.getInstance();
+            c.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
+            Calendar currentDate = Calendar.getInstance(); currentDate.setTime(new Date());
+            UserItems.addToList(itemstring, c, currentDate);
+            if(boxSpinner.getSelectedItem().toString() != "no box"){
+                String[] a = boxSpinner.getSelectedItem().toString().split(UserItems.DASH);
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                User.Box newbox = new User.Box(itemstring, formatter.format((Date)c.getTime()),"value" );
+                UserItems.addBox(a[0],newbox);
+            }
+
+            Toast.makeText(getApplicationContext(),"Item Added", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void openGallery() {
@@ -215,6 +255,16 @@ public class ItemadditionActivity extends AppCompatActivity {
                     openGallery();
                 }
                 break;
+            case PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION:{
+                if (requestCode == PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Do something with granted permission
+                    WifiManager wifimanager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                    WifiReceiver receiverWifi = new WifiReceiver();
+                    registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+                    wifimanager.startScan();
+                }
+            }break;
         }
     }
 
@@ -437,5 +487,14 @@ public class ItemadditionActivity extends AppCompatActivity {
         return message;
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        //unregisterReceiver(receiverWifi);
+        //WifiManager wifimanager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        //wifimanager.removeNetwork(netId);
+
+    }
 }
+
 

@@ -14,8 +14,9 @@ import java.util.HashMap;
 
 public class UserItems {
     //These are characters that i chose to use to split items that are saved together
-    public static String itemListDelimiter = ";/;";
-    public static String BoxDelimiter = ";-;";
+    public static String DELIMLIST = ";/;";
+    public static String DELIMBOX = ";-;";
+    public static String DASH = " - ";
 
     //These are all the variables
     private static UserItems mInstance;
@@ -69,8 +70,7 @@ public class UserItems {
         Date dateAddedTime = dateAdded.getTime();
         String outputdateAdded = formatter.format(dateAddedTime);
         String outputdate = formatter.format(dateExpiresTime);
-        itemName=itemName.replace(";","");
-        String tolist = itemName + itemListDelimiter + outputdate+itemListDelimiter+outputdateAdded;
+        String tolist = itemName + DELIMLIST + outputdate+ DELIMLIST +outputdateAdded;
         list.add(tolist);
         lastUpdate = System.currentTimeMillis();
     }
@@ -85,11 +85,15 @@ public class UserItems {
         Boxes.remove(key);lastUpdate = System.currentTimeMillis();
     }
     public static void removeItem(String item){
-        list.remove(item);lastUpdate = System.currentTimeMillis();
+        list.remove(item);
+        String[] box = item.split(DASH);
+        if(Boxes.containsKey(box[0])){Boxes.remove(box[0]);}
+        lastUpdate = System.currentTimeMillis();
     }
 
     public static void clearUser(){
         list=null; userid=null; username=null; lastUpdate=0;
         Boxes = null;
     }
+
 }

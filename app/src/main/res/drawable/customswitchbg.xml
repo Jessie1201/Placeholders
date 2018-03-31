@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:state_enabled="false"
+        android:drawable="@drawable/button1"
+        />
+    <item
+        android:state_focused="true"
+        android:drawable="@drawable/ic_add_food_button"/>
+    <item
+        android:drawable="@drawable/button1"
+        />
+
+
+</selector>

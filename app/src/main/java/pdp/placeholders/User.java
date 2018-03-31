@@ -6,12 +6,11 @@ import java.util.Date;
 import java.util.HashMap;
 
 public class User {
-    private static DatabaseReference mDatabase;
-
-
     String userid;
     String username;
     ArrayList<String> userlist;
+    ArrayList<String> thrown_out;
+    int eaten=0;
     long lastupdate;
     HashMap<String,Box> Boxes;
     public User(){
@@ -25,6 +24,12 @@ public class User {
         this.lastupdate = lastupdate;
         this.Boxes = boxes;
 
+    }
+    public void thrownOut(String item){
+        thrown_out.add(item);
+    }
+    public void Eaten(){
+        eaten+=1;
     }
 
     public String getUserid() {

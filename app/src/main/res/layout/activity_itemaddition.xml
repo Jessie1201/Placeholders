@@ -23,75 +23,49 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <EditText
-        android:id="@+id/ETitemName"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="236dp"
-        android:ems="10"
-        android:hint="@string/item_name"
-        android:inputType="text|textPersonName"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageView"
-        app:layout_constraintHorizontal_bias="0.96"
-        app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:orientation="vertical">
+        <EditText
+            android:id="@+id/ETitemName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="236dp"
+            android:ems="10"
+            android:hint="@string/item_name"
+            android:inputType="text|textPersonName"
+            android:textAlignment="center" />
 
-    <ProgressBar
-        android:id="@+id/progressbar"
-        style="@style/Widget.AppCompat.ProgressBar"
-        android:layout_width="match_parent"
-        app:layout_constraintTop_toTopOf="@+id/ETitemName"
-        android:layout_height="48dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_centerInParent="true"
-        android:visibility="gone"
-        tools:layout_editor_absoluteX="4dp"
-        tools:layout_editor_absoluteY="259dp" />
+        <DatePicker
+            android:id="@+id/datePicker2"
+            android:theme="@style/my_time_picker_style"
+            android:layout_width="match_parent"
+            android:layout_marginHorizontal="-20dp"
+            android:layout_height="100dp"
+            android:calendarViewShown="false"
+            android:datePickerMode="spinner" />
 
-    <Spinner
-        android:id="@+id/targettime"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:textAlignment="center"
-        android:gravity="center"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ETitemName" />
+        <Spinner
+            android:id="@+id/targetbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:textAlignment="center"
+            android:visibility="visible" />
 
-    <Spinner
-        android:id="@+id/targetbox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:gravity="center"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:textAlignment="center"
-        android:visibility="visible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/targettime" />
+    </LinearLayout>
+
 
     <Button
         android:id="@+id/btnDone" android:text="@string/done_button"
         android:layout_width="100dp" android:layout_height="40dp"
-
         android:background="@drawable/button1"
         android:backgroundTint="@color/colorOBlue"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toRightOf="@id/btnNextItem"
@@ -120,5 +94,16 @@
         app:layout_constraintRight_toLeftOf="@id/btnNextItem"
         app:layout_constraintBottom_toBottomOf="@id/btnDone"
         android:gravity="center" />
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ETitemName" />
 
 </android.support.constraint.ConstraintLayout>

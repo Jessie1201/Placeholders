@@ -60,7 +60,6 @@ public class FirebaseHelper {
                                         ((Activity)context).finish();
                                         context.startActivity(intent);
                                     }
-
                                 } else {
                                     saveArrayList();
                                 }
@@ -83,9 +82,10 @@ public class FirebaseHelper {
         String serverUpdate = "lastupdate";
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("users");
         if(UserItems.getUserid()!=null){
-            User.Box beta = new User.Box("item","2018-10-01","value");
-            UserItems.addBox("savebox",beta);
-            UserItems.getBoxes();
+            if (UserItems.getInstance().getBoxes()==null){
+                User.Box beta = new User.Box("item","2018-10-01","value");
+                UserItems.addBox("savebox",beta);
+            }
             User user = new User(UserItems.getUserid(),
                     UserItems.getUsername(), UserItems.getList(), UserItems.getInstance().getLastUpdate(),
                     UserItems.getInstance().getBoxes());
