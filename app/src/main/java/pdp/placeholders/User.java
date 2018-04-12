@@ -9,7 +9,7 @@ public class User {
     String userid;
     String username;
     ArrayList<String> userlist;
-    ArrayList<String> thrown_out;
+    ArrayList<String> thrownout;
     int eaten=0;
     long lastupdate;
     HashMap<String,Box> Boxes;
@@ -20,13 +20,16 @@ public class User {
     public User(String userid, String username, ArrayList<String> userlist1, long lastupdate, HashMap<String,Box> boxes){
         this.userid = userid;
         this.username = username;
-        this.userlist = userlist1;
+        if(userlist1.size()<1){userlist1.add("no items");}
+        else {this.userlist = userlist1;}
         this.lastupdate = lastupdate;
         this.Boxes = boxes;
+        this.thrownout = UserItems.thrownout;
+        this.eaten = UserItems.eaten;
 
     }
     public void thrownOut(String item){
-        thrown_out.add(item);
+        thrownout.add(item);
     }
     public void Eaten(){
         eaten+=1;

@@ -1,12 +1,16 @@
 package pdp.placeholders;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -15,16 +19,22 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.telecom.CallScreeningService;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -47,13 +57,14 @@ import com.google.api.services.vision.v1.model.Image;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /** This activity performs the addition of new items.
  It uses Cloud Vision api for the images, otherwise it just adds items to the singleton list.
@@ -74,8 +85,8 @@ public class ItemadditionActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private ImageView mMainImage;
     private EditText ETlabel;
-    private TextView textview;
     private WifiReceiver receiverWifi;
+    private EditText dateText;
     private static final int PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION = 1001;
     int netId;
     DatePicker datePicker;
@@ -85,6 +96,9 @@ public class ItemadditionActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if(Objects.requireNonNull(getIntent().getExtras()).getBoolean("StartCamera",false)){
+            startCamera();
+        }
         receiverWifi= new WifiReceiver();
         WifiManager wifimanager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         super.onCreate(savedInstanceState);
@@ -92,7 +106,6 @@ public class ItemadditionActivity extends AppCompatActivity {
         mProgressBar = (ProgressBar)findViewById(R.id.progressbar);
         ETlabel = (EditText)findViewById(R.id.ETitemName);
         mMainImage = (ImageView) findViewById(R.id.imageView);
-        textview = (TextView)findViewById(R.id.textviewhelper);
         datePicker = (DatePicker)findViewById(R.id.datePicker2);
 
         // TODO: 15.3.2018 create a search after user inputs item name 
@@ -106,7 +119,7 @@ public class ItemadditionActivity extends AppCompatActivity {
         }
         trimboxes.add("New Box");
         final String[] trimbox = trimboxes.toArray(new String[0]);
-        ArrayAdapter<String> boxadapter = new ArrayAdapter<String>(this,R.layout.my_spinner_style, trimbox);
+        final ArrayAdapter<String> boxadapter = new ArrayAdapter<String>(this,R.layout.my_spinner_style, trimbox);
         boxadapter.setDropDownViewResource(R.layout.my_spinner_style);
         final Spinner boxSpinner = (Spinner)findViewById(R.id.targetbox);
         boxSpinner.setAdapter(boxadapter);
@@ -151,16 +164,31 @@ public class ItemadditionActivity extends AppCompatActivity {
 
             }
         });
+        dateText = (EditText)findViewById(R.id.datetext);
+        dateText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               mydatepickerdialog();
+        }});
+        FrameLayout dateFrame = (FrameLayout)findViewById(R.id.dateframe);
+        dateFrame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mydatepickerdialog();
+            }
+        });
 
-        Button btnNextItem = (Button)findViewById(R.id.btnNextItem);
+        ImageView btnNextItem = (ImageView)findViewById(R.id.btnNextItem);
         btnNextItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addItemToList(boxSpinner);
+                boxadapter.notifyDataSetChanged();
                 ETlabel.setText("");
                 mMainImage.setImageResource(android.R.color.transparent);
+                startCamera();
             }
-        });
+        });/*
         //Sets a function to the click on the Pick image button
         Button btnPickImage = (Button) findViewById(R.id.btnPickImage);
         btnPickImage.setOnClickListener(new View.OnClickListener() {
@@ -168,13 +196,20 @@ public class ItemadditionActivity extends AppCompatActivity {
             public void onClick(View v) {
                 galleryOrCamera();
             }
-        });
+        });*/
         Button btnDone = (Button)findViewById(R.id.btnDone);
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(ETlabel.getText()!=null){
                     addItemToList(boxSpinner);}
+                finish();
+            }
+        });
+        Button btnBack = (Button)findViewById(R.id.btnback);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 finish();
             }
         });
@@ -216,7 +251,15 @@ public class ItemadditionActivity extends AppCompatActivity {
                 UserItems.addBox(a[0],newbox);
             }
 
-            Toast.makeText(getApplicationContext(),"Item Added", Toast.LENGTH_LONG).show();
+            Snackbar sb = Snackbar.make(getWindow().getDecorView().getRootView(),"Item Added",Snackbar.LENGTH_LONG);
+            sb.getView().setBackgroundResource(R.color.myGreen);
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)sb.getView().getLayoutParams();
+            params.gravity = Gravity.TOP;
+            sb.getView().setLayoutParams(params);
+            sb.show();
+
+
+            Toast.makeText(getApplicationContext(),itemstring+" has been successfully added!", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -259,10 +302,7 @@ public class ItemadditionActivity extends AppCompatActivity {
                 if (requestCode == PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Do something with granted permission
-                    WifiManager wifimanager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                    WifiReceiver receiverWifi = new WifiReceiver();
-                    registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-                    wifimanager.startScan();
+                 WifiReceiver.helperWifi(getApplicationContext());
                 }
             }break;
         }
@@ -341,6 +381,7 @@ public class ItemadditionActivity extends AppCompatActivity {
         return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
     }
     /** This function does most of the vision tasks. */
+    @SuppressLint("StaticFieldLeak")
     private void callCloudVision(final Bitmap bitmap) throws IOException {
         // Switch text to loading
         mProgressBar.setVisibility(View.VISIBLE);
@@ -436,7 +477,6 @@ public class ItemadditionActivity extends AppCompatActivity {
                         Toast.LENGTH_LONG).show();}
                 mProgressBar.setVisibility(View.GONE);
 
-                textview.setText(result);
             }
         }.execute();
     }
@@ -490,9 +530,45 @@ public class ItemadditionActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        FirebaseHelper.getArrayList(null,null);
         //unregisterReceiver(receiverWifi);
         //WifiManager wifimanager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         //wifimanager.removeNetwork(netId);
+
+    }
+
+
+    private void mydatepickerdialog() {
+        LayoutInflater inflater = (LayoutInflater)getLayoutInflater();
+        View customdp = inflater.inflate(R.layout.customdatepicker,null);
+        final DatePicker dp = findViewById(R.id.setdate);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int year = dp.getYear();
+                int month = dp.getMonth();
+                int dayOfMonth = dp.getDayOfMonth();
+                DateFormat format = new SimpleDateFormat("dd MMM YYYY");
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, month);
+                calendar.set(Calendar.DATE, dayOfMonth);
+                Date date = calendar.getTime();
+                String a = format.format(date);
+                dateText.setText(a);
+            }
+        });
+        builder.setView(customdp);
+        AlertDialog dg = builder.create();
+        dg.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.WRAP_CONTENT);
+        WindowManager.LayoutParams wlp =  dg.getWindow().getAttributes();
+        wlp.gravity=Gravity.BOTTOM;
+        wlp.horizontalMargin=-0;
+        wlp.verticalMargin=-0;
+        dg.getWindow().setAttributes(wlp);
+        dg.show();
+
 
     }
 }

@@ -23,7 +23,7 @@ import java.util.List;
 public class ShowNotificationJob extends JobService {
 
     NotificationCompat.Builder notification;
-    private static final int notificationID = 3478916;
+    public static final int notificationID = 3478916;
 
     @Override
     public boolean onStartJob(JobParameters params) {

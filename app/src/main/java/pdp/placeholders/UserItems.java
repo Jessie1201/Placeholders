@@ -17,6 +17,8 @@ public class UserItems {
     public static String DELIMLIST = ";/;";
     public static String DELIMBOX = ";-;";
     public static String DASH = " - ";
+    public static boolean expiring = false;
+    public static int expired = 0;
 
     //These are all the variables
     private static UserItems mInstance;
@@ -25,8 +27,10 @@ public class UserItems {
     public static String username = null;
     public static long lastUpdate = new Date(0).getTime();
     private static HashMap<String,User.Box> Boxes = null;
+    public static int eaten=0;
+    public static ArrayList<String> thrownout=null;
 
-    //if functions are called from outside, this converts tehm to static operators?
+    //if functions are called from outside, this converts them to static operators?
     public static UserItems getInstance() {
         if(mInstance == null)
             mInstance = new UserItems();
@@ -36,7 +40,9 @@ public class UserItems {
     private UserItems() {
         list = new ArrayList<String>();
         Boxes = new HashMap<String, User.Box>();
+        thrownout = new ArrayList<String>();
     }
+
 
     public static void setUsername(String user){
         username = user;
@@ -76,6 +82,10 @@ public class UserItems {
     }
     public static void addToList(String item){
         list.add(item);lastUpdate = System.currentTimeMillis();
+    }
+
+    public static void addThrownout(String item) {
+        thrownout.add(item);
     }
     public static void addBox (String key, User.Box box){
         Boxes.put(key,box);lastUpdate= System.currentTimeMillis();

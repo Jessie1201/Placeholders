@@ -2,95 +2,131 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/colorPrimaryDark"
     android:layout_width="match_parent"
-    android:descendantFocusability="blocksDescendants"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:id="@+id/alistitem"
-    android:weightSum="3">
-
-    <RelativeLayout
+    android:id="@+id/alistitem">
+    <LinearLayout
+        android:id="@+id/itemlayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimaryDark">
-        <TextView
-            android:id="@+id/lblListItem"
-            android:layout_width="wrap_content"
+        android:orientation="horizontal">
+        <FrameLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:paddingBottom="6dp"
-            android:layout_marginLeft="50dp"
-            android:layout_centerVertical="true"
-            android:textColor="@color/colorAccent"
-            android:singleLine="true"
-            android:textSize="14sp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/leftside"
+            android:layout_gravity="start"
+            android:background="@color/myGreen">
 
-        <TextView
-            android:id="@+id/lblListItemDate"
-            android:singleLine="true"
-            android:gravity="top"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            app:layout_constraintTop_toTopOf="@id/lblListItem"
-            android:layout_marginRight="16dp"
-            android:layout_marginBottom="4dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/colorAccent" />
+            <ImageView
+                android:layout_gravity="start"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:scaleType="center"
+                android:src="@drawable/ic_icon_food"
+                android:layout_marginStart="50dp"
+                android:background="@color/myGreen"
+                android:contentDescription="@string/delete" />
 
-        <LinearLayout
+        </FrameLayout>
+
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
+            android:id="@+id/itemvisible"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/lblListItem"
-            android:layout_alignParentBottom="true"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:weightSum="3">
-            <Button
-                android:id="@+id/btnItemEdit"
-                android:background="@color/colorPrimary"
-                android:drawableLeft="@drawable/orthex_green_box"
-                android:textColor="@color/colorPrimaryDark"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="35dp"
-                android:paddingLeft="5dp"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_marginBottom="4dp"
-                android:textSize="12sp"
-                android:visibility="gone"
-                android:text="@string/edit"/>
-            <Button
-                android:id="@+id/btnItemDispose"
-                android:background="@color/colorPrimary"
-                android:drawableLeft="@drawable/orthex_blue_box"
-                android:textColor="@color/colorPrimaryDark"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="35dp"
-                android:textSize="12sp"
-                android:visibility="gone"
-                android:text="@string/dispose"/>
-            <Button
-                android:id="@+id/btnItemDelete"
-                android:background="@color/colorPrimary"
-                android:drawableLeft="@drawable/orthex_orange_box"
-                android:textColor="@color/colorPrimaryDark"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:layout_width="0dip"
-                android:layout_height="35dp"
-                android:layout_weight="1"
-                android:textSize="12sp"
-                android:visibility="gone"
-                android:text="@string/delete"/>
+            android:background="@color/colorPrimaryDark">
+            <ImageView
+                app:layout_constraintTop_toTopOf="@id/itemvisible"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:id="@+id/itemstatus"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintRight_toLeftOf="@id/lblListItem"/>
+
+            <TextView
+                android:id="@+id/lblListItem"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                android:textColor="@color/colorAccent"
+                android:singleLine="true"
+                android:textSize="14sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/lblListItemDate"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:singleLine="true"
+                android:layout_marginEnd="16dp"
+                android:textColor="@color/colorAccent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toRightOf="parent"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:orientation="horizontal"
+                android:weightSum="2"
+                app:layout_constraintTop_toBottomOf="@id/lblListItem">
+
+                <Button
+                    android:id="@+id/btnItemEdit"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@color/colorPrimaryDark"
+                    android:singleLine="true"
+                    android:text="@string/edit"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/btnItemDelete"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@color/colorPrimaryDark"
+                    android:singleLine="true"
+                    android:text="@string/delete"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="12sp"
+                    android:visibility="gone" />
+
+
+            </LinearLayout>
+        </android.support.constraint.ConstraintLayout>
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/rigside"
+            android:layout_gravity="end"
+            android:background="@color/myRed">
+
+            <ImageView
+                android:layout_gravity="end"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:scaleType="center"
+                android:src="@drawable/ic_icon_bin"
+                android:layout_marginEnd="50dp"
+                android:background="@color/myRed"/>
+
+        </FrameLayout>
 
 
 
-        </LinearLayout>
-    </RelativeLayout>
+    </LinearLayout>
+
+
     </android.support.constraint.ConstraintLayout>

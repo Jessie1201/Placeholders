@@ -29,9 +29,9 @@
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar2"
-            android:background="#F2F7F8"
+            android:background="@color/whitebg"
             android:layout_width="match_parent"
-            android:layout_height="55dp"
+            android:layout_height="50dp"
             android:clickable="false"
             android:minHeight="50dp">
             <RelativeLayout
@@ -87,25 +87,32 @@
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginTop="-10dp"
+            android:switchPadding="10dp"
             android:layout_marginEnd="20dp"
             android:layout_marginStart="20dp"
             android:text="Expiring products" />
 
-
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/itemRecycleview"/>
-
         <ExpandableListView
             android:id="@+id/expndlist"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_gravity="center_vertical"
             android:childDivider="@color/colorAccent"
+            android:descendantFocusability="blocksDescendants"
+            android:groupIndicator="@null"
             android:clipToPadding="false" />
+        <TextView
+            android:layout_width="match_parent"
+            android:paddingStart="50dp"
+            android:paddingEnd="50dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:text="Hey, looks like you haven't added any products yet!"
+            android:textSize="30sp"
+            android:id="@+id/noItemsText"/>
         <ImageView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_illustration_empty_state"
             android:id="@+id/noItemsImage"/>

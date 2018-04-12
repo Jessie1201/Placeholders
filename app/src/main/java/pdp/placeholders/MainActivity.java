@@ -14,11 +14,14 @@ import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.CompoundButton;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.HashMap;
@@ -39,21 +42,22 @@ public class MainActivity extends Activity {
     private List<String> listDataHeader;
     private HashMap<String, List<String>> listHash;
     private TextView UserNameText;
-    private RecyclerView reclist;
     ImageView noItemImage;
+    public Switch expSwitch;
+    TextView noItemText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        final int notificationID = 3478916;
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        noItemText =findViewById(R.id.noItemsText);
+        noItemImage=(ImageView)findViewById(R.id.noItemsImage);
 
         //This part creates a "job" that is taken care of in the ShowNotificationJob
         ComponentName componentName = new ComponentName(this,ShowNotificationJob.class);
         //final int notificationID = 3478916;
-        JobInfo.Builder builder = new JobInfo.Builder(notificationID+1,componentName);
+        JobInfo.Builder builder = new JobInfo.Builder(ShowNotificationJob.notificationID,componentName);
         builder.setPeriodic(TimeUnit.HOURS.toMillis(12));
         builder.setPersisted(true);
         JobScheduler jbSched; JobInfo jobInfo; jobInfo = builder.build();
@@ -88,6 +92,7 @@ public class MainActivity extends Activity {
                 builder.create().show();
             }
         });
+        switchlistener();
         //creates the floating button
         FloatingActionButton btnAddItem = (FloatingActionButton)findViewById(R.id.btnadditem2);
         btnAddItem.setOnClickListener(new View.OnClickListener() {
@@ -97,11 +102,11 @@ public class MainActivity extends Activity {
             }
         });
         refreshFragment();
-        reclist = (RecyclerView)findViewById(R.id.itemRecycleview);
-        noItemImage=(ImageView)findViewById(R.id.noItemsImage);
-        if(UserItems.getList().size()<1){itemlist.setVisibility(View.GONE);
-        reclist.setVisibility(View.GONE);}else{
-            noItemImage.setVisibility(View.GONE);
+
+
+
+        if(UserItems.getList().size()<1){itemlist.setVisibility(View.GONE);}else{
+            noItemImage.setVisibility(View.GONE); noItemText.setVisibility(View.GONE);
         }
         if(Build.VERSION.SDK_INT>=21){//creates color for status bar
             Window window =this.getWindow();
@@ -110,17 +115,42 @@ public class MainActivity extends Activity {
             window.setStatusBarColor(this.getResources().getColor(R.color.colorPrimary));
         }
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();
         FirebaseHelper.getArrayList(null,null);
-        listAdapter.notifyDataSetChanged();
         refreshFragment();
+        listAdapter.notifyDataSetChanged();
+
+    }
+    public void switchlistener(){
+        expSwitch = findViewById(R.id.switch1);
+        expSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    UserItems.expired = 0;
+                    UserItems.expiring=true;
+                }else {UserItems.expiring=false;}
+                listAdapter.notifyDataSetChanged();
+                if(UserItems.expired==0 && isChecked){
+                    noItemImage.setImageResource(R.drawable.ic_illustration_no_food);
+                    noItemImage.setVisibility(View.VISIBLE);
+                    itemlist.setVisibility(View.GONE);
+                    noItemText.setVisibility(View.VISIBLE);
+                    noItemText.setText("All your food is fresh and in order!");
+                }else {noItemImage.setVisibility(View.GONE);
+                noItemText.setVisibility(View.GONE);
+                itemlist.setVisibility(View.VISIBLE);}
+            }
+
+        });
     }
 
     private void refreshFragment() {
         //Creates the list, and a button for each item
+
         itemlist = (ExpandableListView)findViewById(R.id.expndlist);
         itemlist.setChildDivider(getResources().getDrawable(R.color.colorPrimaryDark));
         listAdapter = new ExpandableListAdapter(getApplicationContext(), listDataHeader,listHash);
@@ -131,6 +161,7 @@ public class MainActivity extends Activity {
 
     private void startAddItemActivity() {
         Intent intent = new Intent(getApplicationContext(), ItemadditionActivity.class);
+        intent.putExtra("StartCamera",true);
         startActivity(intent);
     }
 
@@ -140,6 +171,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        FirebaseHelper.getArrayList(null,null);
 
         SharedPreferences.Editor sprefs = getSharedPreferences("userprefs", MODE_PRIVATE).edit();
         sprefs.putString("username",UserItems.getUsername());

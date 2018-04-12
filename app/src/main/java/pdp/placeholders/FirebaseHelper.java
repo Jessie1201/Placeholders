@@ -43,9 +43,10 @@ public class FirebaseHelper {
                                 Long serverLastMilis = (long) dataSnapshot.child(serverUpdate).getValue();
                                 long a=UserItems.getLastUpdate();
                                 if (a <=serverLastMilis) {
+                                    //UserItems.eaten=(int)dataSnapshot.child("eaten").getValue();
+                                    UserItems.thrownout =(ArrayList<String>)dataSnapshot.child("thrownout").getValue();
                                     UserItems.setList(list1);
                                     HashMap<String, User.Box> FBoxes = new HashMap<>();
-
                                     for (DataSnapshot postSnapshot : dataSnapshot.child(BOXES).getChildren()) {
                                         String boxid = postSnapshot.getKey();
                                         String boxexpiration = postSnapshot.child("expiration").getValue().toString();

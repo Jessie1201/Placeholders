@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ProxyInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
@@ -17,6 +18,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -36,9 +38,20 @@ import java.util.List;
  */
 
 public class WifiReceiver extends BroadcastReceiver {
+    static WifiManager wifimanager;
+    static WifiReceiver receiverWifi;
+    static String previousWifi;
+    public static void helperWifi(Context context){
+        wifimanager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
+        receiverWifi = new WifiReceiver();
+        context.registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+        wifimanager.startScan();
+
+    }
+
+
     @Override
     public void onReceive(final Context context, Intent intent) {
-
         final WifiManager wifimanager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         ScanResult boxWifi = null;
         WifiInfo wifiInfo = wifimanager.getConnectionInfo();
@@ -64,6 +77,7 @@ public class WifiReceiver extends BroadcastReceiver {
             if (missing){
                 wifiConfig.SSID = boxWifi.SSID;
                 wifiConfig.preSharedKey = String.format("\"%s\"", "12345678");
+                wifiConfig.priority=99999;
                 try{
                     setStaticIpConfiguration(wifiManager,wifiConfig,InetAddress.getByName("10.0.1.1"), 24,
                             InetAddress.getByName("10.0.1.100"),
@@ -71,76 +85,94 @@ public class WifiReceiver extends BroadcastReceiver {
                 }catch (Exception e){}
                 netId= wifiManager.addNetwork(wifiConfig);
             }
-            wifiManager.disconnect();
-            wifiManager.enableNetwork(netId, true);
+            if(currentSSID.contains("FoodGuard")){
+                context.unregisterReceiver(this);
+                AlertDialog.Builder wifiad = new AlertDialog.Builder(context);
+                wifiad.setTitle("Please enter details for "+currentSSID+"setup");
+                wifiad.setMessage("Enter Wifi Name:");
+                LinearLayout linearLayout = new LinearLayout(context);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                final EditText wifiname = new EditText(context);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
 
-            // TODO: 19.3.2018 set logic for allowed types of names
+                wifiname.setText(previousWifi.replace("\"",""));
+                wifiname.setLayoutParams(lp);
+                linearLayout.setLayoutParams(lp);
+                linearLayout.addView(wifiname);
+                final EditText wifipass = new EditText(context);
+                wifipass.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                wifipass.setHint("WifiPassword");
+                linearLayout.addView(wifipass);
+                final EditText boxname= new EditText(context);
+                boxname.setHint("Boxname");
+                boxname.setLayoutParams(lp);
+                linearLayout.addView(boxname);
+                wifiad.setView(linearLayout);
+                wifiad.setPositiveButton("Done",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int which) {
+                                //I cant believe this actually worked
+                                StringRequest sR1 = new StringRequest(Request.Method.GET,
+                                        "\"http://10.0.1.1/wifi?",null,null);
+                                String toboxURL = "http://10.0.1.1/wifisave?s="+wifiname.getText().toString()
+                                        +"&p="+wifipass.getText().toString()
+                                        +"&NAME="+boxname.getText().toString()
+                                        +"&UID=" +UserItems.getUserid();
+                                String UID=UserItems.getUserid();
+                                String wifiid = wifiname.getText().toString();
+                                String boxid = boxname.getText().toString();
+                                final RequestQueue mRequestQueue = Volley.newRequestQueue(context);
+                                mRequestQueue.add(sR1);
+                                final StringRequest stringRequest = (StringRequest) new StringRequest(Request.Method.PUT,
+                                        toboxURL, new Response.Listener<String>() {
+                                    @Override
+                                    public void onResponse(String response) {
+                                        Log.d("wifiresponse",response);
+                                        Toast.makeText(context,"Settings added to box successfully",Toast.LENGTH_SHORT).show();
+                                        UserItems.addBox(boxname.getText().toString(),new User.Box("empty","2022-06-13","update"));
 
-            AlertDialog.Builder wifiad = new AlertDialog.Builder(context);
-            wifiad.setTitle("Box details");
-            wifiad.setMessage("Enter Wifi Name:");
-            LinearLayout linearLayout = new LinearLayout(context);
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            final EditText wifiname = new EditText(context);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
+                                        wifimanager.disconnect();
+                                        int netId1= wifiConfig.networkId;
+                                        wifimanager.removeNetwork(netId1);
+                                        wifimanager.reconnect();
 
-            wifiname.setText(currentSSID.replace("\"",""));
-            wifiname.setLayoutParams(lp);
-            linearLayout.setLayoutParams(lp);
-            linearLayout.addView(wifiname);
-            final EditText wifipass = new EditText(context);
-            wifipass.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            wifipass.setHint("WifiPassword");
-            linearLayout.addView(wifipass);
-            final EditText boxname= new EditText(context);
-            boxname.setHint("Boxname");
-            boxname.setLayoutParams(lp);
-            linearLayout.addView(boxname);
-            wifiad.setView(linearLayout);
-            wifiad.setPositiveButton("Done",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog,int which) {
-                            //I cant believe this actually worked
-                            StringRequest sR1 = new StringRequest(Request.Method.GET,
-                                    "\"http://10.0.1.1/wifi?",null,null);
-                            String toboxURL = "http://10.0.1.1/wifisave?s="+wifiname.getText().toString()
-                                    +"&p="+wifipass.getText().toString()
-                                    +"&NAME="+boxname.getText().toString()
-                                    +"&UID=" +UserItems.getUserid();
-                            String UID=UserItems.getUserid();
-                            String wifiid = wifiname.getText().toString();
-                            String boxid = boxname.getText().toString();
-                            RequestQueue mRequestQueue = Volley.newRequestQueue(context);
-                            mRequestQueue.add(sR1);
-                            StringRequest stringRequest = new StringRequest(Request.Method.PUT,
-                                    toboxURL, new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    Log.d("wifiresponse",response);
-                                    Toast.makeText(context,"Settings added to box successfully",Toast.LENGTH_SHORT).show();
-                                    UserItems.addBox(boxname.getText().toString(),new User.Box("empty","2022-06-13","update"));
-                                    int netId1= wifiConfig.networkId;
-                                }
-                            }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Toast.makeText(context,"Connection to Foodguard failed",Toast.LENGTH_LONG).show();
-                                }
-                            });
-                            mRequestQueue.add(stringRequest);
-                        }
-                    });
-            // Setting Negative "NO" Button
-            wifiad.setNegativeButton("Cancel",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Write your code here to execute after dialog
-                            //dialog.cancel();
-                        }
-                    });
-            wifiad.show();
+                                    }
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Toast.makeText(context,"Connection to Foodguard failed",Toast.LENGTH_LONG).show();
+                                        int netId1= wifiConfig.networkId;
+                                        wifimanager.removeNetwork(netId1);
+
+                                    }
+                                }).setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                                mRequestQueue.add(stringRequest);
+                            }
+                        });
+                // Setting Negative "NO" Button
+                wifiad.setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Write your code here to execute after dialog
+                                //dialog.cancel();
+                            }
+                        });
+                wifiad.show();
+            }
+            else{
+                previousWifi=currentSSID;
+                wifiManager.disconnect();
+                wifiManager.enableNetwork(netId, true);
+                wifiManager.reconnect();
+
+                // TODO: 19.3.2018 set logic for allowed types of names
+
+            }
+
+        }else{
+            Toast.makeText(context,"Could not find a box",Toast.LENGTH_SHORT).show();
         }
     }
     @SuppressWarnings("unchecked")
@@ -203,4 +235,5 @@ public class WifiReceiver extends BroadcastReceiver {
             parameterClasses[i] = Class.forName(parameterTypes[i]);
 
     }
+
 }

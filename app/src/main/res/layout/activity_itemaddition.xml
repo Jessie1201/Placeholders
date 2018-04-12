@@ -6,94 +6,231 @@
     android:layout_height="match_parent"
     tools:context="pdp.placeholders.ItemadditionActivity">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:alpha="0.4"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <TextView
-        android:id="@+id/textviewhelper"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar2"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="#F2F7F8"
+            android:clickable="false"
+            android:minHeight="50dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/btnback"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:background="#F2F7F8"
+                    android:shadowColor="#f0F1F1"
+                    android:text="Cancel"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_centerHorizontal="true"
+
+                    android:text="Add Item"/>
+
+                <Button
+                    android:id="@+id/btnDone"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:background="#F2F7F8"
+                    android:shadowColor="#f0F1F1"
+                    android:text="@string/done_button"
+                    />
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.Toolbar>
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/colorOBlue"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_weight="1"
+            app:layout_constraintVertical_bias="0.0" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/whitebg"
+            />
+        <ImageView
+            android:id="@+id/btnNextItem"
+            android:focusable="true"
+            android:clickable="true"
+            android:layout_width="match_parent"
+            android:src="@drawable/ic_add_another_button"
+            android:gravity="end"
+            android:scaleType="fitEnd"
+            android:paddingEnd="@dimen/activity_vertical_margin"
+            android:paddingBottom="20dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-60dp" />
         <EditText
             android:id="@+id/ETitemName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="236dp"
+            android:layout_marginStart="20dp"
+            android:gravity="start"
+            android:textSize="30sp"
             android:ems="10"
+            android:backgroundTint="@color/colorPrimaryDark"
             android:hint="@string/item_name"
-            android:inputType="text|textPersonName"
-            android:textAlignment="center" />
+            android:inputType="text|textPersonName"/>
 
-        <DatePicker
-            android:id="@+id/datePicker2"
-            android:theme="@style/my_time_picker_style"
+        <View
             android:layout_width="match_parent"
-            android:layout_marginHorizontal="-20dp"
-            android:layout_height="100dp"
-            android:calendarViewShown="false"
-            android:datePickerMode="spinner" />
+            android:layout_height="3dp"
+            android:background="@color/whitebg"
+            />
 
-        <Spinner
-            android:id="@+id/targetbox"
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:gravity="center"
-            android:padding="@dimen/activity_horizontal_margin"
-            android:textAlignment="center"
-            android:visibility="visible" />
+            android:focusable="true"
+            android:clickable="true"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/dateframe">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:padding="25dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_icon_status_yellow_warning"/>
+
+
+
+            <android.support.design.widget.TextInputLayout
+                android:paddingStart="70dp"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:focusable="false"
+                android:clickable="false"
+                android:gravity="start">
+
+                <AutoCompleteTextView
+                    android:id="@+id/datetext"
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:layout_width="300dp"
+                    android:layout_height="38dp"
+                    android:layout_margin="4dp"
+                    android:backgroundTint="@color/colorPrimaryDark"
+                    android:gravity="start"
+                    android:hint="Exp. date"
+                    android:maxLines="1"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:text="2 April" />
+
+            </android.support.design.widget.TextInputLayout>
+            <DatePicker
+                android:id="@+id/datePicker2"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:visibility="gone"
+                android:calendarViewShown="false"
+                android:datePickerMode="spinner"
+                android:theme="@style/my_time_picker_style" />
+        </FrameLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@color/whitebg"
+            />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:clickable="true"
+            android:id="@+id/boxframe">
+
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="25dp"
+                android:src="@drawable/ic_icon_box"/>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:focusable="false"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:paddingStart="70dp"
+                android:gravity="start">
+
+                <AutoCompleteTextView
+                    android:id="@+id/boxtext"
+                    android:layout_width="300dp"
+                    android:layout_height="39dp"
+                    android:layout_margin="4dp"
+                    android:backgroundTint="@color/colorPrimaryDark"
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:gravity="start"
+                    android:hint="Box"
+                    android:maxLines="1"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:text="Bread" />
+
+            </android.support.design.widget.TextInputLayout>
+            <Spinner
+                android:id="@+id/targetbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:gravity="center"
+                android:padding="@dimen/activity_horizontal_margin"
+                android:textAlignment="center"
+                android:visibility="gone" />
+
+        </FrameLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@color/whitebg"
+            />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:id="@+id/messageframe">
+            <EditText
+                android:id="@+id/messageText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:padding="@dimen/activity_vertical_margin"
+                android:hint="Write a message for the box here"/>
+
+        </FrameLayout>
+
 
     </LinearLayout>
-
-
-    <Button
-        android:id="@+id/btnDone" android:text="@string/done_button"
-        android:layout_width="100dp" android:layout_height="40dp"
-        android:background="@drawable/button1"
-        android:backgroundTint="@color/colorOBlue"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/btnNextItem"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"/>
-
-    <Button
-        android:id="@+id/btnNextItem" android:text="@string/next_item"
-        android:layout_width="100dp" android:layout_height="40dp"
-
-        android:background="@drawable/button1"
-        android:backgroundTint="@color/colorOGreen"
-
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/btnDone"
-        app:layout_constraintBottom_toBottomOf="@+id/btnDone"
-        android:gravity="center" />
-
-    <Button
-        android:id="@+id/btnPickImage" android:text="Pick Image"
-        android:layout_width="100dp" android:layout_height="40dp"
-        android:background="@drawable/button1"
-
-        app:layout_constraintTop_toTopOf="@+id/btnDone"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/btnNextItem"
-        app:layout_constraintBottom_toBottomOf="@id/btnDone"
-        android:gravity="center" />
 
     <ProgressBar
         android:id="@+id/progressbar"
@@ -104,6 +241,7 @@
         android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/ETitemName" />
+        app:layout_constraintTop_toTopOf="@+id/ETitemName"
+        tools:ignore="NotSibling" />
 
 </android.support.constraint.ConstraintLayout>
