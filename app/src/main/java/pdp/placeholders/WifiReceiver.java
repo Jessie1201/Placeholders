@@ -41,6 +41,7 @@ public class WifiReceiver extends BroadcastReceiver {
     static WifiManager wifimanager;
     static WifiReceiver receiverWifi;
     static String previousWifi;
+
     public static void helperWifi(Context context){
         wifimanager = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
         receiverWifi = new WifiReceiver();
@@ -76,14 +77,28 @@ public class WifiReceiver extends BroadcastReceiver {
             }
             if (missing){
                 wifiConfig.SSID = boxWifi.SSID;
-                wifiConfig.preSharedKey = String.format("\"%s\"", "12345678");
-                wifiConfig.priority=99999;
+                wifiConfig.status = WifiConfiguration.Status.ENABLED;
+                wifiConfig.preSharedKey ="\"" +"12345678"+ "\"";
+
                 try{
                     setStaticIpConfiguration(wifiManager,wifiConfig,InetAddress.getByName("10.0.1.1"), 24,
                             InetAddress.getByName("10.0.1.100"),
                             new InetAddress[] {InetAddress.getByName("10.0.1.3"), InetAddress.getByName("10.0.1.4")});
                 }catch (Exception e){}
+
+                wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+                wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+                wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+                wifiConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+                wifiConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+                wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
                 netId= wifiManager.addNetwork(wifiConfig);
+                wifiManager.disconnect();
+                wifiManager.enableNetwork(netId, true);
+                wifiManager.reconnect();
+                //wifiConfig.priority=99999;
+
+
             }
             if(currentSSID.contains("FoodGuard")){
                 context.unregisterReceiver(this);
@@ -160,7 +175,7 @@ public class WifiReceiver extends BroadcastReceiver {
                             }
                         });
                 wifiad.show();
-            }
+            }/*
             else{
                 previousWifi=currentSSID;
                 wifiManager.disconnect();
@@ -169,7 +184,7 @@ public class WifiReceiver extends BroadcastReceiver {
 
                 // TODO: 19.3.2018 set logic for allowed types of names
 
-            }
+            }*/
 
         }else{
             Toast.makeText(context,"Could not find a box",Toast.LENGTH_SHORT).show();

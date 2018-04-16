@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:gravity="bottom">
     <DatePicker
+        android:backgroundTint="@color/colorOBlue"
         android:id="@+id/setdate"
         android:scaleX="1.5"
         android:scaleY="1.5"

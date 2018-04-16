@@ -54,15 +54,20 @@ public class MainActivity extends Activity {
         noItemText =findViewById(R.id.noItemsText);
         noItemImage=(ImageView)findViewById(R.id.noItemsImage);
 
+
+
+
         //This part creates a "job" that is taken care of in the ShowNotificationJob
         ComponentName componentName = new ComponentName(this,ShowNotificationJob.class);
         //final int notificationID = 3478916;
         JobInfo.Builder builder = new JobInfo.Builder(ShowNotificationJob.notificationID,componentName);
-        builder.setPeriodic(TimeUnit.HOURS.toMillis(12));
+        builder.setPeriodic(TimeUnit.SECONDS.toMillis(12));
         builder.setPersisted(true);
         JobScheduler jbSched; JobInfo jobInfo; jobInfo = builder.build();
         jbSched = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
         jbSched.schedule(jobInfo);
+
+
 
         // Adds a button to the top part
         UserNameText =(TextView)findViewById(R.id.UserNameText);
@@ -114,6 +119,13 @@ public class MainActivity extends Activity {
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.setStatusBarColor(this.getResources().getColor(R.color.colorPrimary));
         }
+        ImageView boxAdd = (ImageView)findViewById(R.id.addBoxImage);
+        boxAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WifiReceiver.helperWifi(MainActivity.this);
+            }
+        });
     }
 
     @Override
@@ -172,7 +184,6 @@ public class MainActivity extends Activity {
     protected void onPause() {
         super.onPause();
         FirebaseHelper.getArrayList(null,null);
-
         SharedPreferences.Editor sprefs = getSharedPreferences("userprefs", MODE_PRIVATE).edit();
         sprefs.putString("username",UserItems.getUsername());
         sprefs.putString("userid",UserItems.getUserid());

@@ -9,7 +9,7 @@
         <item name="android:spinnerDropDownItemStyle">@style/spinnerItemStyle</item>
     </style>
     <style name="my_time_picker_style">
-        <item name="android:textSize">24dp</item>
+        <item name="android:textSize">24sp</item>
     </style>
     <style name="spinnerItemStyle">
         <item name="android:gravity">center</item>
@@ -21,4 +21,14 @@
         <item name="android:layout_margin">@dimen/activity_vertical_margin</item>
     </style>
 
+    <style name="BottomOptionsDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:textColor">@color/colorOBlue</item>
+        <item name="android:layout_gravity">bottom</item>
+
+    </style>
 </resources>

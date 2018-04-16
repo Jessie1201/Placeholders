@@ -2,15 +2,15 @@ package pdp.placeholders;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -24,6 +24,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telecom.CallScreeningService;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -36,6 +37,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -58,6 +60,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -82,11 +85,14 @@ public class ItemadditionActivity extends AppCompatActivity {
     private static final int GALLERY_IMAGE_REQUEST = 1;
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int CAMERA_IMAGE_REQUEST = 3;
+    private static final String DISPLAY_DATE_FORMAT ="dd MMMM yyyy" ;
     private ProgressBar mProgressBar;
     private ImageView mMainImage;
     private EditText ETlabel;
     private WifiReceiver receiverWifi;
     private EditText dateText;
+    private EditText boxtext;
+
     private static final int PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION = 1001;
     int netId;
     DatePicker datePicker;
@@ -99,8 +105,6 @@ public class ItemadditionActivity extends AppCompatActivity {
         if(Objects.requireNonNull(getIntent().getExtras()).getBoolean("StartCamera",false)){
             startCamera();
         }
-        receiverWifi= new WifiReceiver();
-        WifiManager wifimanager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_itemaddition);
         mProgressBar = (ProgressBar)findViewById(R.id.progressbar);
@@ -142,9 +146,9 @@ public class ItemadditionActivity extends AppCompatActivity {
                                         //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
 
                                     }else{
-                                        WifiManager wifimanager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                                        registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-                                        wifimanager.startScan();
+                                        //WifiManager wifimanager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                                        //registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+                                        //wifimanager.startScan();
                                     }
 
                                 }
@@ -165,6 +169,9 @@ public class ItemadditionActivity extends AppCompatActivity {
             }
         });
         dateText = (EditText)findViewById(R.id.datetext);
+        DateFormat format = new SimpleDateFormat(DISPLAY_DATE_FORMAT);
+        dateText.setText(format.format(new Date()));
+
         dateText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,6 +184,17 @@ public class ItemadditionActivity extends AppCompatActivity {
                 mydatepickerdialog();
             }
         });
+        boxtext = (EditText)findViewById(R.id.boxtext);
+        boxtext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                myBoxPickerDialog();
+                WifiReceiver.helperWifi(ItemadditionActivity.this);
+                //receiverWifi= new WifiReceiver();
+                //WifiManager wifimanager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            }
+        });
+
 
         ImageView btnNextItem = (ImageView)findViewById(R.id.btnNextItem);
         btnNextItem.setOnClickListener(new View.OnClickListener() {
@@ -241,15 +259,24 @@ public class ItemadditionActivity extends AppCompatActivity {
         if (itemstring.trim().length() > 0) {
             // TODO: 24.3.2018 replace if statements with values from datepicker
             Calendar c = Calendar.getInstance();
-            c.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
-            Calendar currentDate = Calendar.getInstance(); currentDate.setTime(new Date());
-            UserItems.addToList(itemstring, c, currentDate);
-            if(boxSpinner.getSelectedItem().toString() != "no box"){
-                String[] a = boxSpinner.getSelectedItem().toString().split(UserItems.DASH);
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                User.Box newbox = new User.Box(itemstring, formatter.format((Date)c.getTime()),"value" );
-                UserItems.addBox(a[0],newbox);
+            DateFormat format = new SimpleDateFormat(DISPLAY_DATE_FORMAT);
+            try {
+                Date date = format.parse(dateText.getText().toString());
+                c.setTime(date);
+                //c.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
+                Calendar currentDate = Calendar.getInstance(); currentDate.setTime(new Date());
+                UserItems.addToList(itemstring, c, currentDate);
+                if(boxSpinner.getSelectedItem().toString() != "no box"){
+                    String[] a = boxSpinner.getSelectedItem().toString().split(UserItems.DASH);
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                    User.Box newbox = new User.Box(itemstring, formatter.format((Date)c.getTime()),"value" );
+                    UserItems.addBox(a[0],newbox);
+                }
+
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
+
 
             Snackbar sb = Snackbar.make(getWindow().getDecorView().getRootView(),"Item Added",Snackbar.LENGTH_LONG);
             sb.getView().setBackgroundResource(R.color.myGreen);
@@ -302,7 +329,7 @@ public class ItemadditionActivity extends AppCompatActivity {
                 if (requestCode == PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Do something with granted permission
-                 WifiReceiver.helperWifi(getApplicationContext());
+                 WifiReceiver.helperWifi(ItemadditionActivity.this);
                 }
             }break;
         }
@@ -541,15 +568,15 @@ public class ItemadditionActivity extends AppCompatActivity {
     private void mydatepickerdialog() {
         LayoutInflater inflater = (LayoutInflater)getLayoutInflater();
         View customdp = inflater.inflate(R.layout.customdatepicker,null);
-        final DatePicker dp = findViewById(R.id.setdate);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final DatePicker dp =customdp.findViewById(R.id.setdate);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this,R.style.BottomOptionsDialogTheme);
         builder.setPositiveButton("DONE", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 int year = dp.getYear();
                 int month = dp.getMonth();
                 int dayOfMonth = dp.getDayOfMonth();
-                DateFormat format = new SimpleDateFormat("dd MMM YYYY");
+                DateFormat format = new SimpleDateFormat(DISPLAY_DATE_FORMAT);
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(Calendar.YEAR, year);
                 calendar.set(Calendar.MONTH, month);
@@ -559,17 +586,74 @@ public class ItemadditionActivity extends AppCompatActivity {
                 dateText.setText(a);
             }
         });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
         builder.setView(customdp);
         AlertDialog dg = builder.create();
+
         dg.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.WRAP_CONTENT);
         WindowManager.LayoutParams wlp =  dg.getWindow().getAttributes();
+        wlp.x=0;
         wlp.gravity=Gravity.BOTTOM;
-        wlp.horizontalMargin=-0;
         wlp.verticalMargin=-0;
+        dg.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         dg.getWindow().setAttributes(wlp);
+        dg.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                Button negativeButton = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE);
+                Button positiveButton = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 2f);
+                negativeButton.setLayoutParams(params);
+                positiveButton.setLayoutParams(params);
+
+                negativeButton.invalidate();
+                positiveButton.invalidate();
+            }
+        });
         dg.show();
+    }
+    private void myBoxPickerDialog() {
+        final TextView boxtext = findViewById(R.id.boxtext);
+        final CharSequence[] myBoxes = UserItems.getBoxes().keySet().toArray(new CharSequence[0]);
+        int checkedItem = 0;
+        AlertDialog.Builder builder = new AlertDialog.Builder(ItemadditionActivity.this);
+        builder.setSingleChoiceItems(myBoxes, checkedItem, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                boxtext.setText(myBoxes[which]);
 
 
+            }
+        });
+
+        AlertDialog dg = builder.create();
+/*
+        dg.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.WRAP_CONTENT);
+        WindowManager.LayoutParams wlp =  dg.getWindow().getAttributes();
+        wlp.x=0;
+        wlp.gravity=Gravity.BOTTOM;
+        wlp.verticalMargin=-0;
+        dg.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        dg.getWindow().setAttributes(wlp);
+        dg.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                Button negativeButton = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_NEGATIVE);
+                Button positiveButton = ((AlertDialog) dialog).getButton(DialogInterface.BUTTON_POSITIVE);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 2f);
+                negativeButton.setLayoutParams(params);
+                positiveButton.setLayoutParams(params);
+
+                negativeButton.invalidate();
+                positiveButton.invalidate();
+            }
+        });*/
+        dg.show();
     }
 }
 

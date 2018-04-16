@@ -81,7 +81,7 @@ public class LoginActivity extends Activity {
         mPasswordView = (EditText) findViewById(R.id.password);
         mProgressView = findViewById(R.id.login_progress);
 
-        mEmailView.setText("new@new.com");
+        mEmailView.setText("thenew@new.com");
         mPasswordView.setText("123456");
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override

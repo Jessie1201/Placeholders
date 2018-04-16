@@ -59,6 +59,7 @@
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:text="@string/app_name"/>
                 <ImageView
+                    android:id="@+id/addBoxImage"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
                     android:src="@drawable/ic_icon_add_box"
