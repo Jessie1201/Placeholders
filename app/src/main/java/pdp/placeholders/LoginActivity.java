@@ -64,9 +64,11 @@ public class LoginActivity extends Activity {
         if(sprefs.contains("username")){
             UserItems.setUsername(sprefs.getString("username",null));
             UserItems.setUserId(sprefs.getString("userid",null));
+
             ArrayList<String> list1 = new ArrayList<>(sprefs.getStringSet("userlist",null));
             FirebaseHelper.getArrayList(this,MainActivity.class);
         }
+        UserItems.lastUpdate = 0;
 
         if(UserItems.getUserid()!=null){
             Intent mIntent = new Intent(getApplicationContext(), MainActivity.class);

@@ -3,7 +3,9 @@ package pdp.placeholders;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -126,6 +128,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         final FrameLayout rightside = convertView.findViewById(R.id.rigside);
         final FrameLayout leftside = convertView.findViewById(R.id.leftside);
         final LinearLayout linearLayout = convertView.findViewById(R.id.itemlayout);
+        //final ImageView logoRecipe = (ImageView) convertView.findViewById(R.id.logoRecipe);
+        //final ImageView logoEdit = (ImageView)convertView.findViewById(R.id.logoEditItem);
+
         txtListChild.setText(txt1[0]);
         txtChildDate.setText("");
         final View midpart = convertView.findViewById(R.id.itemvisible);
@@ -136,16 +141,17 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         if(a >=2){
             String txtdate = txt1[1];
             try {
-                DateFormat formatter = new SimpleDateFormat("yyy-MM-dd");
+                DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                 Date txtDate1 = formatter.parse(txtdate);
                 Date currentdate = Calendar.getInstance().getTime();
                 diff = (txtDate1.getTime() - currentdate.getTime()) / (1000 * 60 * 60 * 24);
                 String strDays = "Days left: " + Long.toString(diff);
                 txtChildDate.setText(strDays);
                 if (diff < 0) {itemStatus.setImageResource(R.drawable.ic_icon_status_red_warning);
-                UserItems.expired+=1;
+                    UserItems.expired+=1;
                 } else if (diff < 3) {itemStatus.setImageResource(R.drawable.ic_icon_status_yellow_warning);
                     UserItems.expired+=1;
+                    UserItems.addExpiringList(txt1[0]);
                 }else if(diff<20){
                     itemStatus.setImageResource(R.drawable.ic_icon_status_ok);
                     if(UserItems.expiring){
@@ -161,6 +167,23 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 e.printStackTrace();
             }
         }
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 Intent intent = new Intent(context, RecipeWebView.class);
+                 intent.putExtra("Searchterm",txtListChild.getText().toString());
+                 context.startActivity(intent);
+             }
+         });
+
+        btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context.getApplicationContext(), ItemadditionActivity.class);
+                intent.putExtra("item",childText);
+                context.startActivity(intent);
+            }
+        });
         convertView.isClickable();
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -168,7 +191,11 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 if (btnDelete.getVisibility() == View.GONE || btnDelete.getVisibility() == View.INVISIBLE) {
                     btnDelete.setVisibility(View.VISIBLE);
                     btnEdit.setVisibility(View.VISIBLE);
+
+
                     midpart.setBackgroundResource(R.color.colorOOrange);
+                    //logoEdit.setVisibility(View.VISIBLE);
+                    //logoRecipe.setVisibility(View.VISIBLE);
                     //finalConvertView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
                     LinearLayout.LayoutParams params=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                     midpart.setLayoutParams(params);
@@ -176,6 +203,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     finalConvertView.setBackgroundResource(R.color.colorPrimaryDark);
                     btnDelete.setVisibility(View.GONE);
                     btnEdit.setVisibility(View.GONE);
+
+                    //logoEdit.setVisibility(View.GONE);
+                    //logoRecipe.setVisibility(View.GONE);
                     midpart.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                     midpart.setBackgroundResource(R.color.colorPrimaryDark);
 

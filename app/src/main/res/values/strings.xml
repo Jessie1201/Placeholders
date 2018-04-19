@@ -35,5 +35,6 @@
     <string name="signUpDeny">No thank you</string>
     <string name="signUpAccept">Yes please</string>
     <string name="logoutText">Do you want to log out?</string>
+    <string name="title_activity_recipe_web_view">RecipeWebView</string>
 
 </resources>

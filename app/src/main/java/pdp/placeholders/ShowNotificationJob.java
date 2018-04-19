@@ -95,11 +95,8 @@ public class ShowNotificationJob extends JobService {
                     }
                 }
                 List<String> shrtterm = listHash.get("Short-term");
-
             }
-
         }
-
     }
 }
 

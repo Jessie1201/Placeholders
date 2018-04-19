@@ -2,6 +2,7 @@ package pdp.placeholders;
 
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
@@ -12,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
@@ -45,6 +47,7 @@ public class MainActivity extends Activity {
     ImageView noItemImage;
     public Switch expSwitch;
     TextView noItemText;
+    private TextView yourfoodText;
 
 
     @Override
@@ -53,13 +56,37 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         noItemText =findViewById(R.id.noItemsText);
         noItemImage=(ImageView)findViewById(R.id.noItemsImage);
+        expSwitch = findViewById(R.id.switch1);
+        yourfoodText = (TextView)findViewById(R.id.yourfoodTitle);
 
+
+        final int notificationID = 3478916;
+        NotificationCompat.Builder notification;
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notification = new NotificationCompat.Builder(getApplicationContext());
+        notification.setSmallIcon(R.mipmap.ic_launcher);
+        notification.setTicker("this item has expired!");
+        notification.setContentTitle("This item is expired!");
+        notification.setContentText("");
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        notification.setContentIntent(pendingIntent);
+        //ate it button
+        Intent ateit = new Intent(getApplicationContext(), ItemadditionActivity.class);
+        PendingIntent button1 = PendingIntent.getActivity(getApplicationContext(), 0, ateit, PendingIntent.FLAG_UPDATE_CURRENT);
+        notification.addAction(R.drawable.button1, "I ate it", button1);
+        // throw out button
+        Intent throwout = new Intent(getApplicationContext(), LoginActivity.class);
+        PendingIntent button2 = PendingIntent.getActivity(getApplicationContext(), 0, throwout, PendingIntent.FLAG_UPDATE_CURRENT);
+        notification.addAction(R.drawable.button1, "throw out", button2);
+        nm.notify(notificationID, notification.build());
+        //notificationID =+1;
 
 
 
         //This part creates a "job" that is taken care of in the ShowNotificationJob
         ComponentName componentName = new ComponentName(this,ShowNotificationJob.class);
-        //final int notificationID = 3478916;
+
         JobInfo.Builder builder = new JobInfo.Builder(ShowNotificationJob.notificationID,componentName);
         builder.setPeriodic(TimeUnit.SECONDS.toMillis(12));
         builder.setPersisted(true);
@@ -110,8 +137,15 @@ public class MainActivity extends Activity {
 
 
 
-        if(UserItems.getList().size()<1){itemlist.setVisibility(View.GONE);}else{
+        if(UserItems.getList().size()<1){
+            itemlist.setVisibility(View.GONE);
+            expSwitch.setVisibility(View.GONE);
+            yourfoodText.setVisibility(View.GONE);
+        }else{
             noItemImage.setVisibility(View.GONE); noItemText.setVisibility(View.GONE);
+            expSwitch.setVisibility(View.VISIBLE);
+            yourfoodText.setVisibility(View.VISIBLE);
+
         }
         if(Build.VERSION.SDK_INT>=21){//creates color for status bar
             Window window =this.getWindow();
@@ -137,7 +171,7 @@ public class MainActivity extends Activity {
 
     }
     public void switchlistener(){
-        expSwitch = findViewById(R.id.switch1);
+
         expSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -165,10 +199,13 @@ public class MainActivity extends Activity {
 
         itemlist = (ExpandableListView)findViewById(R.id.expndlist);
         itemlist.setChildDivider(getResources().getDrawable(R.color.colorPrimaryDark));
-        listAdapter = new ExpandableListAdapter(getApplicationContext(), listDataHeader,listHash);
+        listAdapter = new ExpandableListAdapter(MainActivity.this, listDataHeader,listHash);
         listAdapter.initData(UserItems.getInstance().getList());
         listAdapter.getListHashMap();
         itemlist.setAdapter(listAdapter);
+    }
+    public void recreatethisActivity(){
+        recreate();
     }
 
     private void startAddItemActivity() {

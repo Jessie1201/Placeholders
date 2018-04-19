@@ -11,13 +11,13 @@ public class User {
     ArrayList<String> userlist;
     ArrayList<String> thrownout;
     int eaten=0;
-    long lastupdate;
+    int lastupdate;
     HashMap<String,Box> Boxes;
     public User(){
 
     }
 
-    public User(String userid, String username, ArrayList<String> userlist1, long lastupdate, HashMap<String,Box> boxes){
+    public User(String userid, String username, ArrayList<String> userlist1, int lastupdate, HashMap<String,Box> boxes){
         this.userid = userid;
         this.username = username;
         if(userlist1.size()<1){userlist1.add("no items");}

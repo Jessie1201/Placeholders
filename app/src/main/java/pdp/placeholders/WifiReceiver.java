@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.net.ProxyInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.support.v4.net.ConnectivityManagerCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
@@ -47,149 +49,161 @@ public class WifiReceiver extends BroadcastReceiver {
         receiverWifi = new WifiReceiver();
         context.registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         wifimanager.startScan();
-
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(wifimanager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
+        context.registerReceiver(receiverWifi,intentFilter);
     }
-
 
     @Override
     public void onReceive(final Context context, Intent intent) {
-        final WifiManager wifimanager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         ScanResult boxWifi = null;
         WifiInfo wifiInfo = wifimanager.getConnectionInfo();
         String currentSSID = wifiInfo.getSSID();
         final WifiConfiguration wifiConfig = new WifiConfiguration();
-        List<ScanResult> wifiList = wifimanager.getScanResults();
-        for(ScanResult i:wifiList){
-            if(i.SSID.contains("FoodGuard")){
-                boxWifi=i; break;
-            }
-        }
-        if(boxWifi!=null){
-            WifiManager wifiManager=(WifiManager)context.getSystemService(context.WIFI_SERVICE);
-            int netId =-1;
-            boolean missing=true;
-            for(WifiConfiguration j:wifimanager.getConfiguredNetworks()){
-                if(j.SSID.contains("FoodGuard")) {
-                    missing=false;
-                    netId = j.networkId;
-                    break;
+        if(wifimanager.getConnectionInfo().getSSID().contains("FoodGuard")){
+            //context.unregisterReceiver(this);
+            AlertDialog.Builder wifiad = new AlertDialog.Builder(context);
+            wifiad.setTitle("Please enter details for "+currentSSID+"setup");
+            wifiad.setMessage("Enter Wifi Name:");
+            LinearLayout linearLayout = new LinearLayout(context);
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            final EditText wifiname = new EditText(context);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+
+            try{
+                wifiname.setText(previousWifi.replace("\"",""));
+            }catch (Exception e){}
+            wifiname.setLayoutParams(lp);
+            linearLayout.setLayoutParams(lp);
+            linearLayout.addView(wifiname);
+            final EditText wifipass = new EditText(context);
+            wifipass.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            wifipass.setHint("WifiPassword");
+            linearLayout.addView(wifipass);
+            final EditText boxname= new EditText(context);
+            boxname.setHint("Boxname");
+            boxname.setLayoutParams(lp);
+            linearLayout.addView(boxname);
+            wifiad.setView(linearLayout);
+            wifiad.setPositiveButton("Done",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int which) {
+                            //I cant believe this actually worked
+                            StringRequest sR1 = new StringRequest(Request.Method.GET,
+                                    "\"http://10.0.1.1/wifi?",null,null);
+                            String toboxURL = "http://10.0.1.1/wifisave?s="+wifiname.getText().toString()
+                                    +"&p="+wifipass.getText().toString()
+                                    +"&NAME="+boxname.getText().toString()
+                                    +"&UID=" +UserItems.getUserid();
+                            String UID=UserItems.getUserid();
+                            String wifiid = wifiname.getText().toString();
+                            String boxid = boxname.getText().toString();
+                            final RequestQueue mRequestQueue = Volley.newRequestQueue(context);
+                            mRequestQueue.add(sR1);
+                            final StringRequest stringRequest = (StringRequest) new StringRequest(Request.Method.PUT,
+                                    toboxURL, new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    Log.d("wifiresponse",response);
+                                    Toast.makeText(context,"Settings added to box successfully",Toast.LENGTH_SHORT).show();
+                                    UserItems.addBox(boxname.getText().toString(),new User.Box("empty","2022-06-13","update"));
+
+                                    wifimanager.disconnect();
+                                    int netId1= wifiConfig.networkId;
+
+                                    wifimanager.removeNetwork(netId1);
+                                    wifimanager.saveConfiguration();
+                                    wifimanager.reconnect();
+
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Toast.makeText(context,"Connection to Foodguard failed",Toast.LENGTH_LONG).show();
+                                    int netId1= wifiConfig.networkId;
+                                    wifimanager.removeNetwork(netId1);
+
+                                }
+                            }).setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                            mRequestQueue.add(stringRequest);
+                        }
+                    });
+            // Setting Negative "NO" Button
+            wifiad.setNegativeButton("Cancel",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Write your code here to execute after dialog
+                            //dialog.cancel();
+                        }
+                    });
+            wifiad.show();
+        }else{
+
+            //final WifiManager wifimanager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+
+            List<ScanResult> wifiList = wifimanager.getScanResults();
+            for(ScanResult i:wifiList){
+                if(i.SSID.contains("FoodGuard")){
+                    boxWifi=i; break;
                 }
             }
-            if (missing){
-                wifiConfig.SSID = boxWifi.SSID;
-                wifiConfig.status = WifiConfiguration.Status.ENABLED;
-                wifiConfig.preSharedKey ="\"" +"12345678"+ "\"";
+            if(boxWifi!=null){
+                int netId =-1;
+                boolean missing=true;
+                for(WifiConfiguration j:wifimanager.getConfiguredNetworks()){
+                    if(j.SSID.contains("FoodGuard")) {
+                        missing=false;
+                        netId = j.networkId;
+                        break;
+                    }
+                }
+                if (missing){
+                    wifiConfig.SSID = boxWifi.SSID;
+                    wifiConfig.status = WifiConfiguration.Status.ENABLED;
+                    wifiConfig.preSharedKey ="\"" +"12345678"+ "\"";
 
-                try{
-                    setStaticIpConfiguration(wifiManager,wifiConfig,InetAddress.getByName("10.0.1.1"), 24,
-                            InetAddress.getByName("10.0.1.100"),
-                            new InetAddress[] {InetAddress.getByName("10.0.1.3"), InetAddress.getByName("10.0.1.4")});
-                }catch (Exception e){}
+                    try{
+                        setStaticIpConfiguration(wifimanager,wifiConfig,InetAddress.getByName("10.0.1.1"), 24,
+                                InetAddress.getByName("10.0.1.100"),
+                                new InetAddress[] {InetAddress.getByName("10.0.1.3"), InetAddress.getByName("10.0.1.4")});
+                    }catch (Exception e){}
 
-                wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-                wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-                wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-                wifiConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-                wifiConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-                wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
-                netId= wifiManager.addNetwork(wifiConfig);
-                wifiManager.disconnect();
-                wifiManager.enableNetwork(netId, true);
-                wifiManager.reconnect();
-                //wifiConfig.priority=99999;
+                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+                    wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+                    wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+                    wifiConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+                    wifiConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+                    wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+                    netId= wifimanager.addNetwork(wifiConfig);
+                    wifimanager.disconnect();
+                    wifimanager.enableNetwork(netId, true);
+                    wifimanager.reconnect();
+                    wifiConfig.priority=99999;
 
 
+                }
+                else{
+                    previousWifi=currentSSID;
+                    wifimanager.disconnect();
+                    wifimanager.enableNetwork(netId, true);
+                    //wifimanager.reconnect();
+
+                    // TODO: 19.3.2018 set logic for allowed types of names
+
+                }
+
+            }else{
+                Toast.makeText(context,"Could not find a box",Toast.LENGTH_SHORT).show();
             }
-            if(currentSSID.contains("FoodGuard")){
-                context.unregisterReceiver(this);
-                AlertDialog.Builder wifiad = new AlertDialog.Builder(context);
-                wifiad.setTitle("Please enter details for "+currentSSID+"setup");
-                wifiad.setMessage("Enter Wifi Name:");
-                LinearLayout linearLayout = new LinearLayout(context);
-                linearLayout.setOrientation(LinearLayout.VERTICAL);
-                final EditText wifiname = new EditText(context);
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
 
-                wifiname.setText(previousWifi.replace("\"",""));
-                wifiname.setLayoutParams(lp);
-                linearLayout.setLayoutParams(lp);
-                linearLayout.addView(wifiname);
-                final EditText wifipass = new EditText(context);
-                wifipass.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                wifipass.setHint("WifiPassword");
-                linearLayout.addView(wifipass);
-                final EditText boxname= new EditText(context);
-                boxname.setHint("Boxname");
-                boxname.setLayoutParams(lp);
-                linearLayout.addView(boxname);
-                wifiad.setView(linearLayout);
-                wifiad.setPositiveButton("Done",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog,int which) {
-                                //I cant believe this actually worked
-                                StringRequest sR1 = new StringRequest(Request.Method.GET,
-                                        "\"http://10.0.1.1/wifi?",null,null);
-                                String toboxURL = "http://10.0.1.1/wifisave?s="+wifiname.getText().toString()
-                                        +"&p="+wifipass.getText().toString()
-                                        +"&NAME="+boxname.getText().toString()
-                                        +"&UID=" +UserItems.getUserid();
-                                String UID=UserItems.getUserid();
-                                String wifiid = wifiname.getText().toString();
-                                String boxid = boxname.getText().toString();
-                                final RequestQueue mRequestQueue = Volley.newRequestQueue(context);
-                                mRequestQueue.add(sR1);
-                                final StringRequest stringRequest = (StringRequest) new StringRequest(Request.Method.PUT,
-                                        toboxURL, new Response.Listener<String>() {
-                                    @Override
-                                    public void onResponse(String response) {
-                                        Log.d("wifiresponse",response);
-                                        Toast.makeText(context,"Settings added to box successfully",Toast.LENGTH_SHORT).show();
-                                        UserItems.addBox(boxname.getText().toString(),new User.Box("empty","2022-06-13","update"));
 
-                                        wifimanager.disconnect();
-                                        int netId1= wifiConfig.networkId;
-                                        wifimanager.removeNetwork(netId1);
-                                        wifimanager.reconnect();
-
-                                    }
-                                }, new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        Toast.makeText(context,"Connection to Foodguard failed",Toast.LENGTH_LONG).show();
-                                        int netId1= wifiConfig.networkId;
-                                        wifimanager.removeNetwork(netId1);
-
-                                    }
-                                }).setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                                mRequestQueue.add(stringRequest);
-                            }
-                        });
-                // Setting Negative "NO" Button
-                wifiad.setNegativeButton("Cancel",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Write your code here to execute after dialog
-                                //dialog.cancel();
-                            }
-                        });
-                wifiad.show();
-            }/*
-            else{
-                previousWifi=currentSSID;
-                wifiManager.disconnect();
-                wifiManager.enableNetwork(netId, true);
-                wifiManager.reconnect();
-
-                // TODO: 19.3.2018 set logic for allowed types of names
-
-            }*/
-
-        }else{
-            Toast.makeText(context,"Could not find a box",Toast.LENGTH_SHORT).show();
         }
+
     }
+
+    //bigmantyrone4413 Wifi1234
     @SuppressWarnings("unchecked")
     private static void setStaticIpConfiguration(WifiManager manager, WifiConfiguration config, InetAddress ipAddress, int prefixLength, InetAddress gateway, InetAddress[] dns) throws ClassNotFoundException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, NoSuchFieldException, InstantiationException
     {

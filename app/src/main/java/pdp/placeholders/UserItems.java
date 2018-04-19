@@ -25,10 +25,11 @@ public class UserItems {
     private static ArrayList<String> list = null;
     public static String userid = null;
     public static String username = null;
-    public static long lastUpdate = new Date(0).getTime();
+    public static int lastUpdate = 0;
     private static HashMap<String,User.Box> Boxes = null;
     public static int eaten=0;
     public static ArrayList<String> thrownout=null;
+    private static ArrayList<String> expiringlist = null;
 
     //if functions are called from outside, this converts them to static operators?
     public static UserItems getInstance() {
@@ -41,6 +42,7 @@ public class UserItems {
         list = new ArrayList<String>();
         Boxes = new HashMap<String, User.Box>();
         thrownout = new ArrayList<String>();
+        expiringlist=new ArrayList<String>();
     }
 
 
@@ -56,7 +58,8 @@ public class UserItems {
     public static String getUsername() {
         return username;
     }
-    public static long getLastUpdate(){return lastUpdate;}
+    public static int getLastUpdate(){return lastUpdate;}
+    public static ArrayList<String> getExpiringlist(){ return expiringlist;}
     public static HashMap<String, User.Box> getBoxes() {
         return Boxes;
     }
@@ -78,27 +81,30 @@ public class UserItems {
         String outputdate = formatter.format(dateExpiresTime);
         String tolist = itemName + DELIMLIST + outputdate+ DELIMLIST +outputdateAdded;
         list.add(tolist);
-        lastUpdate = System.currentTimeMillis();
+        lastUpdate =lastUpdate+1;
     }
     public static void addToList(String item){
-        list.add(item);lastUpdate = System.currentTimeMillis();
+        list.add(item);lastUpdate =lastUpdate+1;
+    }
+    public static void addExpiringList(String item){
+        expiringlist.add(item);
     }
 
     public static void addThrownout(String item) {
         thrownout.add(item);
     }
     public static void addBox (String key, User.Box box){
-        Boxes.put(key,box);lastUpdate= System.currentTimeMillis();
+        Boxes.put(key,box);lastUpdate=lastUpdate+1;
     }
 
     public static void removeBox(String key){
-        Boxes.remove(key);lastUpdate = System.currentTimeMillis();
+        Boxes.remove(key);lastUpdate =lastUpdate+1;
     }
     public static void removeItem(String item){
         list.remove(item);
         String[] box = item.split(DASH);
         if(Boxes.containsKey(box[0])){Boxes.remove(box[0]);}
-        lastUpdate = System.currentTimeMillis();
+        lastUpdate = lastUpdate+1;
     }
 
     public static void clearUser(){

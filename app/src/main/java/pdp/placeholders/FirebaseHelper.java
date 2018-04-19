@@ -40,11 +40,11 @@ public class FirebaseHelper {
                                 // Get user list'
                                 ArrayList<String> list1;
                                 list1 = (ArrayList<String>) dataSnapshot.child(userlist).getValue();
-                                Long serverLastMilis = (long) dataSnapshot.child(serverUpdate).getValue();
-                                long a=UserItems.getLastUpdate();
+                                int serverLastMilis = Integer.valueOf(dataSnapshot.child(serverUpdate).getValue().toString());
+                                int a=UserItems.getLastUpdate();
                                 if (a <=serverLastMilis) {
-                                    //UserItems.eaten=(int)dataSnapshot.child("eaten").getValue();
-                                    UserItems.thrownout =(ArrayList<String>)dataSnapshot.child("thrownout").getValue();
+                                    UserItems.eaten=Integer.valueOf(dataSnapshot.child("eaten").getValue().toString());
+                                    //UserItems.thrownout =(ArrayList<String>)dataSnapshot.child("thrownout").getValue();
                                     UserItems.setList(list1);
                                     HashMap<String, User.Box> FBoxes = new HashMap<>();
                                     for (DataSnapshot postSnapshot : dataSnapshot.child(BOXES).getChildren()) {
@@ -54,12 +54,14 @@ public class FirebaseHelper {
                                         String boxupdate = postSnapshot.child("updatevalue").getValue().toString();
                                         User.Box newbox = new User.Box(boxitem,boxexpiration,boxupdate);
                                         FBoxes.put(boxid,newbox);
+
                                      }
                                     if(FBoxes.size()>0){UserItems.setBoxes(FBoxes);}
                                     if(LaunchActivity!=null){
                                         Intent intent =new Intent(context, LaunchActivity);
-                                        ((Activity)context).finish();
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         context.startActivity(intent);
+                                        ((Activity)context).finish();
                                     }
                                 } else {
                                     saveArrayList();

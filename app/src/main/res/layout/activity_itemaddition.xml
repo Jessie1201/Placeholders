@@ -83,18 +83,38 @@
             android:paddingBottom="20dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="-60dp" />
-        <EditText
-            android:id="@+id/ETitemName"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="20dp"
-            android:gravity="start"
-            android:textSize="30sp"
-            android:ems="10"
-            android:backgroundTint="@color/colorPrimaryDark"
-            android:hint="@string/item_name"
-            android:inputType="text|textPersonName"/>
+            android:focusable="true"
+            android:clickable="true"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/edittextframe">
+            <EditText
+                android:id="@+id/ETitemName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="20dp"
+                android:paddingBottom="20dp"
+                android:paddingTop="20dp"
+                android:gravity="start"
+                android:textSize="30sp"
+                android:fontFamily="@font/ibm_plex_sans_text"
+                android:ems="10"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:hint="@string/item_name"
+                android:inputType="text|textPersonName"/>
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="25dp"
+                android:layout_gravity="end"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_icon_edit"/>
+
+        </FrameLayout>
 
         <View
             android:layout_width="match_parent"
@@ -112,15 +132,15 @@
             android:id="@+id/dateframe">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:padding="25dp"
-                android:layout_height="wrap_content"
+                android:layout_width="20dp"
+                android:layout_margin="25dp"
+                android:layout_height="20dp"
                 android:src="@drawable/ic_icon_status_yellow_warning"/>
 
 
 
             <android.support.design.widget.TextInputLayout
-                android:paddingStart="70dp"
+                android:paddingStart="55dp"
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -133,8 +153,10 @@
                     android:id="@+id/datetext"
                     android:focusable="false"
                     android:clickable="false"
+                    android:textSize="16sp"
                     android:layout_width="300dp"
                     android:layout_height="38dp"
+                    android:fontFamily="@font/ibm_plex_sans_text"
                     android:layout_margin="4dp"
                     android:backgroundTint="@color/colorPrimaryDark"
                     android:gravity="start"
@@ -145,14 +167,15 @@
                     android:text="2 April" />
 
             </android.support.design.widget.TextInputLayout>
-            <DatePicker
-                android:id="@+id/datePicker2"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:visibility="gone"
-                android:calendarViewShown="false"
-                android:datePickerMode="spinner"
-                android:theme="@style/my_time_picker_style" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_margin="25dp"
+                android:layout_gravity="end"
+                android:fontFamily="@font/ibm_plex_sans_text"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_icon_calendar"/>
+
         </FrameLayout>
         <View
             android:layout_width="match_parent"
@@ -163,14 +186,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:focusable="true"
+            android:layout_gravity="center"
             android:clickable="true"
             android:id="@+id/boxframe">
 
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="25dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_margin="25dp"
                 android:src="@drawable/ic_icon_box"/>
 
             <android.support.design.widget.TextInputLayout
@@ -179,7 +203,7 @@
                 android:paddingTop="@dimen/activity_vertical_margin"
                 android:focusable="false"
                 android:backgroundTint="@color/colorPrimaryDark"
-                android:paddingStart="70dp"
+                android:paddingStart="55dp"
                 android:gravity="start">
 
                 <AutoCompleteTextView
@@ -187,10 +211,12 @@
                     android:layout_width="300dp"
                     android:layout_height="39dp"
                     android:layout_margin="4dp"
+                    android:textSize="16sp"
                     android:backgroundTint="@color/colorPrimaryDark"
                     android:focusable="false"
                     android:clickable="false"
                     android:gravity="start"
+                    android:fontFamily="@font/ibm_plex_sans_text"
                     android:hint="Box"
                     android:maxLines="1"
                     android:padding="10dp"
@@ -207,6 +233,15 @@
                 android:padding="@dimen/activity_horizontal_margin"
                 android:textAlignment="center"
                 android:visibility="gone" />
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="25dp"
+                android:layout_gravity="end"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_arrow_prev"
+                android:tint="#d9e3e5"
+                android:rotation="180"/>
 
         </FrameLayout>
         <View
@@ -223,9 +258,11 @@
                 android:id="@+id/messageText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/ibm_plex_sans_text"
                 android:ems="10"
                 android:padding="@dimen/activity_vertical_margin"
                 android:hint="Write a message for the box here"/>
+
 
         </FrameLayout>
 

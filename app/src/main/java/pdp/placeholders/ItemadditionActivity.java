@@ -85,7 +85,10 @@ public class ItemadditionActivity extends AppCompatActivity {
     private static final int GALLERY_IMAGE_REQUEST = 1;
     public static final int CAMERA_PERMISSIONS_REQUEST = 2;
     public static final int CAMERA_IMAGE_REQUEST = 3;
-    private static final String DISPLAY_DATE_FORMAT ="dd MMMM yyyy" ;
+    private static final String DISPLAY_DATE_FORMAT ="dd MMMM yyyy";
+
+    private static final String SAVED_DATE_FORMAT ="yyyy-MM-dd";
+
     private ProgressBar mProgressBar;
     private ImageView mMainImage;
     private EditText ETlabel;
@@ -102,17 +105,29 @@ public class ItemadditionActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if(Objects.requireNonNull(getIntent().getExtras()).getBoolean("StartCamera",false)){
-            startCamera();
-        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_itemaddition);
         mProgressBar = (ProgressBar)findViewById(R.id.progressbar);
         ETlabel = (EditText)findViewById(R.id.ETitemName);
         mMainImage = (ImageView) findViewById(R.id.imageView);
-        datePicker = (DatePicker)findViewById(R.id.datePicker2);
+        dateText = (EditText)findViewById(R.id.datetext);
+        DateFormat format = new SimpleDateFormat(DISPLAY_DATE_FORMAT);
+        dateText.setText(format.format(new Date()));
+        if(Objects.requireNonNull(getIntent().getExtras()).getBoolean("StartCamera",false)){
+            startCamera();
+        }
 
-        // TODO: 15.3.2018 create a search after user inputs item name 
+        try {
+            String item = getIntent().getStringExtra("item");
+            final String[] txt1 =item.replace(UserItems.DELIMBOX," - ").split(UserItems.DELIMLIST);
+            ETlabel.setText(txt1[0]);
+            DateFormat sformat = new SimpleDateFormat(SAVED_DATE_FORMAT);
+            Date editDate= sformat.parse(txt1[1]);
+            dateText.setText(format.format(editDate));
+        }catch (Exception e){
+            Log.d(TAG, "onCreate: could not find intent extras");
+        }
+        // TODO: 15.3.2018 create a search after user inputs item name
         //Creates the time dropdown menu options
         String[] SpinnerList ={getString(R.string.short_term), getString(R.string.medium_term), getString(R.string.long_term)};
         Object[] boxes =UserItems.getInstance().getBoxes().keySet().toArray();
@@ -168,9 +183,6 @@ public class ItemadditionActivity extends AppCompatActivity {
 
             }
         });
-        dateText = (EditText)findViewById(R.id.datetext);
-        DateFormat format = new SimpleDateFormat(DISPLAY_DATE_FORMAT);
-        dateText.setText(format.format(new Date()));
 
         dateText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -196,11 +208,12 @@ public class ItemadditionActivity extends AppCompatActivity {
         });
 
 
+
         ImageView btnNextItem = (ImageView)findViewById(R.id.btnNextItem);
         btnNextItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addItemToList(boxSpinner);
+                addItemToList(boxtext.getText().toString());
                 boxadapter.notifyDataSetChanged();
                 ETlabel.setText("");
                 mMainImage.setImageResource(android.R.color.transparent);
@@ -220,7 +233,11 @@ public class ItemadditionActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(ETlabel.getText()!=null){
-                    addItemToList(boxSpinner);}
+                    addItemToList(boxtext.getText().toString());
+                    if (getIntent().getStringExtra("item")!=null){
+                        UserItems.removeItem(getIntent().getStringExtra("item"));
+                    }
+                }
                 finish();
             }
         });
@@ -254,7 +271,7 @@ public class ItemadditionActivity extends AppCompatActivity {
     }
     // Adds item to the singleton list
     // TODO: 15.3.2018 Change the date option into something more custommizable
-    private void addItemToList(Spinner boxSpinner) {
+    private void addItemToList(String boxSpinner) {
         String itemstring = ETlabel.getText().toString();
         if (itemstring.trim().length() > 0) {
             // TODO: 24.3.2018 replace if statements with values from datepicker
@@ -266,9 +283,9 @@ public class ItemadditionActivity extends AppCompatActivity {
                 //c.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
                 Calendar currentDate = Calendar.getInstance(); currentDate.setTime(new Date());
                 UserItems.addToList(itemstring, c, currentDate);
-                if(boxSpinner.getSelectedItem().toString() != "no box"){
-                    String[] a = boxSpinner.getSelectedItem().toString().split(UserItems.DASH);
-                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                if(boxSpinner != "no box" && boxSpinner!="" && boxSpinner!="Bread"){
+                    String[] a = boxSpinner.split(UserItems.DASH);
+                    SimpleDateFormat formatter = new SimpleDateFormat(SAVED_DATE_FORMAT);
                     User.Box newbox = new User.Box(itemstring, formatter.format((Date)c.getTime()),"value" );
                     UserItems.addBox(a[0],newbox);
                 }
@@ -500,6 +517,7 @@ public class ItemadditionActivity extends AppCompatActivity {
 
             protected void onPostExecute(String result) { //once it recieves a result
                 ETlabel.setText(result);
+
                 if( result==null){Toast.makeText(getApplicationContext(), "could not detect",
                         Toast.LENGTH_LONG).show();}
                 mProgressBar.setVisibility(View.GONE);
