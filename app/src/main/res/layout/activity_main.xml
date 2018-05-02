@@ -57,7 +57,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
-                    android:fontFamily="@font/ibm_plex_sans_text"
+                    android:fontFamily="@font/fira_sans"
                     android:clickable="true"
                     android:contextClickable="true"
                     android:gravity="center_vertical"
@@ -66,13 +66,13 @@
                     android:paddingLeft="@dimen/activity_horizontal_margin"
                     android:text="@string/app_name"/>
                 <ImageView
+                    android:paddingStart="15dp"
                     android:id="@+id/addBoxImage"
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
                     android:src="@drawable/ic_icon_add_box"
                     android:layout_centerVertical="true"
-                    android:layout_marginRight="15dp"
-                    android:layout_marginTop="15dp"
+                    android:paddingEnd="15dp"
                     android:layout_alignParentRight="true"
                     />
 
@@ -84,13 +84,13 @@
         <TextView
             android:id="@+id/yourfoodTitle"
             android:layout_width="match_parent"
-            android:fontFamily="@font/ibm_plex_sans_light"
-            android:textColor="@color/colorAccent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:text="Your food"
             android:background="@color/white"
             android:backgroundTint="@color/white"
+            android:fontFamily="@font/fira_sans_light"
+            android:padding="20dp"
+            android:text="Your food"
+            android:textColor="@color/colorAccent"
             android:textSize="25sp" />
 
         <Switch
@@ -106,7 +106,7 @@
             android:layout_marginBottom="20dp"
             android:switchPadding="10dp"
             android:layout_marginEnd="20dp"
-            android:fontFamily="@font/ibm_plex_sans_text"
+            android:fontFamily="@font/fira_sans"
             android:layout_marginStart="20dp"
             android:text="Expiring products" />
         <View
@@ -121,6 +121,7 @@
             android:layout_height="fill_parent"
             android:layout_gravity="center_vertical"
             android:dividerHeight="2dp"
+            android:childDivider="@color/whitebg"
             android:divider="@color/whitebg"
             android:descendantFocusability="blocksDescendants"
             android:groupIndicator="@null"
@@ -130,7 +131,7 @@
             android:layout_marginTop="50dp"
             android:paddingStart="50dp"
             android:paddingEnd="50dp"
-            android:fontFamily="@font/ibm_plex_sans_text"
+            android:fontFamily="@font/fira_sans"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:textAlignment="center"

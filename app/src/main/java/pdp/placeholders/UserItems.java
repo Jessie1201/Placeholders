@@ -1,5 +1,6 @@
 package pdp.placeholders;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -110,6 +111,16 @@ public class UserItems {
     public static void clearUser(){
         list=null; userid=null; username=null; lastUpdate=0;
         Boxes = null;
+    }
+    public static long countDays(String dateIn){
+        try {
+            DateFormat formatter = new SimpleDateFormat("yyy-MM-dd");
+            Date txtDate1 = formatter.parse(dateIn);
+            Date currentdate = Calendar.getInstance().getTime();
+            long diff = (txtDate1.getTime() - currentdate.getTime()) / (1000 * 60 * 60 * 24);
+            return diff;
+        }catch (Exception e){e.printStackTrace();}
+        return 0;
     }
 
 }

@@ -8,9 +8,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -43,6 +41,7 @@ public class FirebaseHelper {
                                 int serverLastMilis = Integer.valueOf(dataSnapshot.child(serverUpdate).getValue().toString());
                                 int a=UserItems.getLastUpdate();
                                 if (a <=serverLastMilis) {
+                                    UserItems.lastUpdate=serverLastMilis;
                                     UserItems.eaten=Integer.valueOf(dataSnapshot.child("eaten").getValue().toString());
                                     //UserItems.thrownout =(ArrayList<String>)dataSnapshot.child("thrownout").getValue();
                                     UserItems.setList(list1);
@@ -57,17 +56,20 @@ public class FirebaseHelper {
 
                                      }
                                     if(FBoxes.size()>0){UserItems.setBoxes(FBoxes);}
-                                    if(LaunchActivity!=null){
+                                    if(LaunchActivity!=null && context!=null){
                                         Intent intent =new Intent(context, LaunchActivity);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                         context.startActivity(intent);
                                         ((Activity)context).finish();
+                                    }else if(LaunchActivity==null && context!=null){
+                                        //case where i want to launch the notification
+                                        ShowNotificationAlarm.createNoitification(context);
                                     }
+
                                 } else {
                                     saveArrayList();
                                 }
                             }
-
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
                                 Log.w("does it matter", "getUser:onCancelled", databaseError.toException());

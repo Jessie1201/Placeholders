@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
+import javax.annotation.Nullable;
+
 public class User {
     String userid;
     String username;
@@ -54,10 +56,16 @@ public class User {
 
         public Box(){
         }
-        public Box(String item, String expir, String update){
-            this.itemname = item;
-            this.expiration = expir;
-            this.updatevalue = update;
+        public Box(@Nullable String item,@Nullable String expir,@Nullable String update){
+            if(item ==null ||expir ==null ||update ==null){
+                this.itemname = "empty";
+                this.expiration = "2094-09-30";
+                this.updatevalue = "update";
+            }else {
+                this.itemname = item;
+                this.expiration = expir;
+                this.updatevalue = update;
+            }
         }
     }
 }

@@ -1,11 +1,13 @@
 package pdp.placeholders;
 
 
-import android.app.NotificationManager;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,10 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -26,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -59,42 +60,7 @@ public class MainActivity extends Activity {
         expSwitch = findViewById(R.id.switch1);
         yourfoodText = (TextView)findViewById(R.id.yourfoodTitle);
 
-
-        final int notificationID = 3478916;
-        NotificationCompat.Builder notification;
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notification = new NotificationCompat.Builder(getApplicationContext());
-        notification.setSmallIcon(R.mipmap.ic_launcher);
-        notification.setTicker("this item has expired!");
-        notification.setContentTitle("This item is expired!");
-        notification.setContentText("");
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        notification.setContentIntent(pendingIntent);
-        //ate it button
-        Intent ateit = new Intent(getApplicationContext(), ItemadditionActivity.class);
-        PendingIntent button1 = PendingIntent.getActivity(getApplicationContext(), 0, ateit, PendingIntent.FLAG_UPDATE_CURRENT);
-        notification.addAction(R.drawable.button1, "I ate it", button1);
-        // throw out button
-        Intent throwout = new Intent(getApplicationContext(), LoginActivity.class);
-        PendingIntent button2 = PendingIntent.getActivity(getApplicationContext(), 0, throwout, PendingIntent.FLAG_UPDATE_CURRENT);
-        notification.addAction(R.drawable.button1, "throw out", button2);
-        nm.notify(notificationID, notification.build());
-        //notificationID =+1;
-
-
-
-        //This part creates a "job" that is taken care of in the ShowNotificationJob
-        ComponentName componentName = new ComponentName(this,ShowNotificationJob.class);
-
-        JobInfo.Builder builder = new JobInfo.Builder(ShowNotificationJob.notificationID,componentName);
-        builder.setPeriodic(TimeUnit.SECONDS.toMillis(12));
-        builder.setPersisted(true);
-        JobScheduler jbSched; JobInfo jobInfo; jobInfo = builder.build();
-        jbSched = (JobScheduler) getSystemService(JOB_SCHEDULER_SERVICE);
-        jbSched.schedule(jobInfo);
-
-
+        //ShowNotificationJob.startNotification(getApplicationContext());
 
         // Adds a button to the top part
         UserNameText =(TextView)findViewById(R.id.UserNameText);
@@ -144,6 +110,7 @@ public class MainActivity extends Activity {
         }else{
             noItemImage.setVisibility(View.GONE); noItemText.setVisibility(View.GONE);
             expSwitch.setVisibility(View.VISIBLE);
+            itemlist.setVisibility(View.VISIBLE);
             yourfoodText.setVisibility(View.VISIBLE);
 
         }
@@ -162,12 +129,42 @@ public class MainActivity extends Activity {
         });
     }
 
+    private void startNotification(Context context) {
+        /*Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.MINUTE,50);
+        cal.set(Calendar.HOUR_OF_DAY,11);
+        if(cal.before(Calendar.getInstance())){
+        //    cal.add(Calendar.HOUR,12);
+        }
+        Intent notintent = new Intent(this, ShowNotificationAlarm.class);
+        PendingIntent pendintent = PendingIntent.getBroadcast(this,0,notintent,PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
+        assert alarm != null;
+
+        // interval for alarm find alarm fix alarm
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP,cal.getTimeInMillis(),AlarmManager.INTERVAL_FIFTEEN_MINUTES/15,pendintent);
+        */
+        ComponentName jobcomponent = new ComponentName(this,ShowNotificationJob.class);
+        JobInfo.Builder jobInfo = new JobInfo.Builder(123123,jobcomponent);
+        jobInfo.setPeriodic(TimeUnit.MINUTES.toMillis(1));
+        jobInfo.setPersisted(true);
+        jobInfo.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED);
+        JobInfo bultjob = jobInfo.build();
+        JobScheduler jobScheduler = (JobScheduler)getSystemService(context.JOB_SCHEDULER_SERVICE);
+        jobScheduler.schedule(bultjob);
+
+
+
+
+
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         FirebaseHelper.getArrayList(null,null);
-        refreshFragment();
         listAdapter.notifyDataSetChanged();
+        refreshFragment();
 
     }
     public void switchlistener(){
@@ -176,7 +173,7 @@ public class MainActivity extends Activity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    UserItems.expired = 0;
+                    //UserItems.expired = 0;
                     UserItems.expiring=true;
                 }else {UserItems.expiring=false;}
                 listAdapter.notifyDataSetChanged();
@@ -198,14 +195,11 @@ public class MainActivity extends Activity {
         //Creates the list, and a button for each item
 
         itemlist = (ExpandableListView)findViewById(R.id.expndlist);
-        itemlist.setChildDivider(getResources().getDrawable(R.color.colorPrimaryDark));
+        //itemlist.setChildDivider(getResources().getDrawable(R.color.colorPrimaryDark));
         listAdapter = new ExpandableListAdapter(MainActivity.this, listDataHeader,listHash);
         listAdapter.initData(UserItems.getInstance().getList());
         listAdapter.getListHashMap();
         itemlist.setAdapter(listAdapter);
-    }
-    public void recreatethisActivity(){
-        recreate();
     }
 
     private void startAddItemActivity() {
@@ -233,4 +227,10 @@ public class MainActivity extends Activity {
         }
         sprefs.apply();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //ShowNotificationJob.startNotification(this);
+        }
 }

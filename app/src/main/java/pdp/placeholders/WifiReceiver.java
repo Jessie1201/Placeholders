@@ -17,6 +17,9 @@ import android.support.v4.net.ConnectivityManagerCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -35,6 +38,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.Inflater;
 
 /**
  * Created by Valtteri on 23.3.2018.
@@ -68,90 +72,70 @@ public class WifiReceiver extends BroadcastReceiver {
     public void isConnectedToFoodGuard(final Context context){
         dialog.dismiss();
         context.unregisterReceiver(this);
-        AlertDialog.Builder wifiad = new AlertDialog.Builder(context);
+        final AlertDialog wifiad = new AlertDialog.Builder(context).create();
 
-        wifiad.setTitle("Please enter details for "+currentSSID+"setup");
-        wifiad.setMessage("Enter Wifi Name:");
-        LinearLayout linearLayout = new LinearLayout(context);
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-        final EditText wifiname = new EditText(context);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View alertDialogView = inflater.inflate(R.layout.wifidialog,null);
 
-        try{
-            wifiname.setText(previousWifi.replace("\"",""));
-        }catch (Exception e){}
-        wifiname.setLayoutParams(lp);
-        linearLayout.setLayoutParams(lp);
-        linearLayout.addView(wifiname);
-        final EditText wifipass = new EditText(context);
-        wifipass.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        wifipass.setHint("WifiPassword");
-        linearLayout.addView(wifipass);
-        final EditText boxname= new EditText(context);
-        boxname.setHint("Boxname");
-        boxname.setLayoutParams(lp);
-        linearLayout.addView(boxname);
-        wifiad.setView(linearLayout);
-        wifiad.setPositiveButton("Done",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int which) {
-                        //I cant believe this actually worked
-                        StringRequest sR1 = new StringRequest(Request.Method.GET,
-                                "\"http://10.0.1.1/wifi?",null,null);
-                        String toboxURL = "http://10.0.1.1/wifisave?s="+wifiname.getText().toString()
-                                +"&p="+wifipass.getText().toString()
-                                +"&NAME="+boxname.getText().toString()
-                                +"&UID=" +UserItems.getUserid();
-                        String UID=UserItems.getUserid();
-                        String wifiid = wifiname.getText().toString();
-                        String boxid = boxname.getText().toString();
-                        final RequestQueue mRequestQueue = Volley.newRequestQueue(context);
-                        mRequestQueue.add(sR1);
-                        final StringRequest stringRequest = (StringRequest) new StringRequest(Request.Method.PUT,
-                                toboxURL, new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                Log.d("wifiresponse",response);
-                                Toast.makeText(context,"Settings added to box successfully",Toast.LENGTH_SHORT).show();
-                                UserItems.addBox(boxname.getText().toString(),new User.Box("empty","2022-06-13","update"));
-                                int netId1 = wifimanager.getConnectionInfo().getNetworkId();
-                                //int netId1= wifiConfig.networkId;
-                                wifimanager.disconnect();
-                                boolean a = wifimanager.removeNetwork(netId1);
-                                if (a){Toast.makeText(context, "removed successfully",Toast.LENGTH_SHORT).show();;
-                                }else{
-                                    Toast.makeText(context, "remove failed",Toast.LENGTH_SHORT).show();
-                                }
-
-                                //wifimanager.reconnect();
-
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Toast.makeText(context,"Connection to Foodguard failed",Toast.LENGTH_LONG).show();
-                                int netId1= wifiConfig.networkId;
-                                wifimanager.removeNetwork(netId1);
-
-                            }
-                        }).setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-                        mRequestQueue.add(stringRequest);
-                    }
-                });
-        // Setting Negative "NO" Button
-        wifiad.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Write your code here to execute after dialog
+        wifiad.setView(alertDialogView);
+        final EditText wifiname = alertDialogView.findViewById(R.id.wifiname);
+        final EditText wifipass = alertDialogView.findViewById(R.id.wifipassword);
+        final EditText boxname = alertDialogView.findViewById(R.id.boxnamenew);
+        final Button doneBtn = alertDialogView.findViewById(R.id.dialogDone);
+        final Button cancelBtn = alertDialogView.findViewById(R.id.dialogCancel);
+        doneBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StringRequest sR1 = new StringRequest(Request.Method.GET,
+                        "\"http://10.0.1.1/wifi?",null,null);
+                String toboxURL = "http://10.0.1.1/wifisave?s="+wifiname.getText().toString()
+                        +"&p="+wifipass.getText().toString()
+                        +"&NAME="+boxname.getText().toString()
+                        +"&UID=" +UserItems.getUserid();
+                String UID=UserItems.getUserid();
+                String wifiid = wifiname.getText().toString();
+                String boxid = boxname.getText().toString();
+                final RequestQueue mRequestQueue = Volley.newRequestQueue(context);
+                mRequestQueue.add(sR1);
+                final StringRequest stringRequest = (StringRequest) new StringRequest(Request.Method.PUT,
+                        toboxURL, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("wifiresponse",response);
+                        Toast.makeText(context,"Settings added to box successfully",Toast.LENGTH_SHORT).show();
+                        UserItems.addBox(boxname.getText().toString(),new User.Box("empty","2022-06-13","update"));
+                        int netId1 = wifimanager.getConnectionInfo().getNetworkId();
+                        //int netId1= wifiConfig.networkId;
                         wifimanager.disconnect();
-                        dialog.cancel();
-                        dialog.dismiss();
+                        boolean a = wifimanager.removeNetwork(netId1);
+                        if (a){Toast.makeText(context, "removed successfully",Toast.LENGTH_SHORT).show();;
+                        }else{
+                            Toast.makeText(context, "remove failed",Toast.LENGTH_SHORT).show();
+                        }
+                        //wifimanager.reconnect();
                     }
-                });
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(context,"Connection to Foodguard failed",Toast.LENGTH_LONG).show();
+                        int netId1= wifiConfig.networkId;
+                        wifimanager.removeNetwork(netId1);
+                    }
+                }).setRetryPolicy(new DefaultRetryPolicy(DefaultRetryPolicy.DEFAULT_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                mRequestQueue.add(stringRequest);
+                wifiad.dismiss();
+            }
+        });
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Write your code here to execute after dialog
+                wifimanager.disconnect();
+                wifiad.cancel();
+                wifiad.dismiss();
+            }
+        });
         wifiad.show();
-
     }
 
     @Override
@@ -161,9 +145,6 @@ public class WifiReceiver extends BroadcastReceiver {
             isConnectedToFoodGuard(context);
         }else{
             String getSSID = null;
-
-            //final WifiManager wifimanager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-
             List<ScanResult> wifiList = wifimanager.getScanResults();
             for(ScanResult i:wifiList){
                 if(i.SSID.contains("FoodGuard")){
@@ -184,22 +165,15 @@ public class WifiReceiver extends BroadcastReceiver {
                 }
                 if (missing){
                     setUpFoodGuard(netId, getSSID);
-
                 }
                 previousWifi=currentSSID;
-                //wifimanager.disconnect();
                 wifimanager.enableNetwork(netId, true);
-                //wifimanager.reconnect();
-
             }else{
                 dialog.dismiss();
                 context.unregisterReceiver(this);
                 Toast.makeText(context,"Could not find a box",Toast.LENGTH_SHORT).show();
             }
-
-
         }
-
     }
     public void setUpFoodGuard(int netId, String getSSID){
         wifiConfig.SSID = getSSID;

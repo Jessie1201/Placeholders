@@ -100,7 +100,7 @@
                 android:paddingTop="20dp"
                 android:gravity="start"
                 android:textSize="30sp"
-                android:fontFamily="@font/ibm_plex_sans_text"
+                android:fontFamily="@font/fira_sans"
                 android:ems="10"
                 android:backgroundTint="@color/colorPrimaryDark"
                 android:hint="@string/item_name"
@@ -156,7 +156,7 @@
                     android:textSize="16sp"
                     android:layout_width="300dp"
                     android:layout_height="38dp"
-                    android:fontFamily="@font/ibm_plex_sans_text"
+                    android:fontFamily="@font/fira_sans"
                     android:layout_margin="4dp"
                     android:backgroundTint="@color/colorPrimaryDark"
                     android:gravity="start"
@@ -172,7 +172,7 @@
                 android:layout_width="20dp"
                 android:layout_margin="25dp"
                 android:layout_gravity="end"
-                android:fontFamily="@font/ibm_plex_sans_text"
+                android:fontFamily="@font/fira_sans"
                 android:layout_height="20dp"
                 android:src="@drawable/ic_icon_calendar"/>
 
@@ -216,12 +216,12 @@
                     android:focusable="false"
                     android:clickable="false"
                     android:gravity="start"
-                    android:fontFamily="@font/ibm_plex_sans_text"
+                    android:fontFamily="@font/fira_sans"
                     android:hint="Box"
                     android:maxLines="1"
                     android:padding="10dp"
                     android:singleLine="true"
-                    android:text="Bread" />
+                    android:text="No Box" />
 
             </android.support.design.widget.TextInputLayout>
             <Spinner
@@ -258,7 +258,7 @@
                 android:id="@+id/messageText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/ibm_plex_sans_text"
+                android:fontFamily="@font/fira_sans"
                 android:ems="10"
                 android:padding="@dimen/activity_vertical_margin"
                 android:hint="Write a message for the box here"/>

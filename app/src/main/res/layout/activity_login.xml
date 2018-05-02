@@ -85,8 +85,9 @@
 
         <Button
             android:id="@+id/email_sign_in_button"
-            android:background="@drawable/button1"
+            android:background="@drawable/loginbutton"
             android:layout_width="wrap_content"
+            android:textAllCaps="false"
             android:layout_height="55dp"
             android:layout_marginBottom="40dp"
             android:layout_marginTop="16dp"

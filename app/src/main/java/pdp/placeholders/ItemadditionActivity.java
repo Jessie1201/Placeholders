@@ -92,7 +92,6 @@ public class ItemadditionActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private ImageView mMainImage;
     private EditText ETlabel;
-    private WifiReceiver receiverWifi;
     private EditText dateText;
     private EditText boxtext;
 
@@ -112,6 +111,7 @@ public class ItemadditionActivity extends AppCompatActivity {
         mMainImage = (ImageView) findViewById(R.id.imageView);
         dateText = (EditText)findViewById(R.id.datetext);
         DateFormat format = new SimpleDateFormat(DISPLAY_DATE_FORMAT);
+        boxtext = (EditText)findViewById(R.id.boxtext);
         dateText.setText(format.format(new Date()));
         if(Objects.requireNonNull(getIntent().getExtras()).getBoolean("StartCamera",false)){
             startCamera();
@@ -124,6 +124,10 @@ public class ItemadditionActivity extends AppCompatActivity {
             DateFormat sformat = new SimpleDateFormat(SAVED_DATE_FORMAT);
             Date editDate= sformat.parse(txt1[1]);
             dateText.setText(format.format(editDate));
+            if(getIntent().getStringExtra("box").length()>0){
+                String boxname = getIntent().getStringExtra("box");
+                boxtext.setText(boxname);
+            }
         }catch (Exception e){
             Log.d(TAG, "onCreate: could not find intent extras");
         }
@@ -158,14 +162,7 @@ public class ItemadditionActivity extends AppCompatActivity {
                                     if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                                         requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                                                 PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION);
-                                        //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
-
-                                    }else{
-                                        //WifiManager wifimanager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                                        //registerReceiver(receiverWifi, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-                                        //wifimanager.startScan();
                                     }
-
                                 }
                             })
                             .setNegativeButton(R.string.signUpDeny, new DialogInterface.OnClickListener() {
@@ -196,14 +193,10 @@ public class ItemadditionActivity extends AppCompatActivity {
                 mydatepickerdialog();
             }
         });
-        boxtext = (EditText)findViewById(R.id.boxtext);
         boxtext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 myBoxPickerDialog();
-                WifiReceiver.helperWifi(ItemadditionActivity.this);
-                //receiverWifi= new WifiReceiver();
-                //WifiManager wifimanager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             }
         });
 
@@ -219,15 +212,7 @@ public class ItemadditionActivity extends AppCompatActivity {
                 mMainImage.setImageResource(android.R.color.transparent);
                 startCamera();
             }
-        });/*
-        //Sets a function to the click on the Pick image button
-        Button btnPickImage = (Button) findViewById(R.id.btnPickImage);
-        btnPickImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                galleryOrCamera();
-            }
-        });*/
+        });
         Button btnDone = (Button)findViewById(R.id.btnDone);
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -248,7 +233,6 @@ public class ItemadditionActivity extends AppCompatActivity {
                 finish();
             }
         });
-        //galleryOrCamera();
     }
     // Creates the prompt when picking an image
     private void galleryOrCamera() { //creates a popup asking gallery or camera
@@ -282,27 +266,24 @@ public class ItemadditionActivity extends AppCompatActivity {
                 c.setTime(date);
                 //c.set(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
                 Calendar currentDate = Calendar.getInstance(); currentDate.setTime(new Date());
-                UserItems.addToList(itemstring, c, currentDate);
-                if(boxSpinner != "no box" && boxSpinner!="" && boxSpinner!="Bread"){
+                if(!boxSpinner.contains("No Box") && boxSpinner!=""){
                     String[] a = boxSpinner.split(UserItems.DASH);
                     SimpleDateFormat formatter = new SimpleDateFormat(SAVED_DATE_FORMAT);
                     User.Box newbox = new User.Box(itemstring, formatter.format((Date)c.getTime()),"value" );
                     UserItems.addBox(a[0],newbox);
+                }else {
+                    UserItems.addToList(itemstring, c, currentDate);
                 }
 
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-
-
             Snackbar sb = Snackbar.make(getWindow().getDecorView().getRootView(),"Item Added",Snackbar.LENGTH_LONG);
             sb.getView().setBackgroundResource(R.color.myGreen);
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)sb.getView().getLayoutParams();
             params.gravity = Gravity.TOP;
             sb.getView().setLayoutParams(params);
             sb.show();
-
-
             Toast.makeText(getApplicationContext(),itemstring+" has been successfully added!", Toast.LENGTH_LONG).show();
         }
     }
@@ -346,7 +327,6 @@ public class ItemadditionActivity extends AppCompatActivity {
                 if (requestCode == PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Do something with granted permission
-                 WifiReceiver.helperWifi(ItemadditionActivity.this);
                 }
             }break;
         }

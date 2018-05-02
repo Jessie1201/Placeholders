@@ -33,7 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:fontFamily="@font/ibm_plex_sans_text"
+                android:fontFamily="@font/fira_sans"
                 android:clickable="true"
                 android:contextClickable="true"
                 android:gravity="center_vertical"
