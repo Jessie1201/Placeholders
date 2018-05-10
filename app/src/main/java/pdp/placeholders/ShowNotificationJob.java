@@ -42,8 +42,8 @@ public class ShowNotificationJob extends JobService {
 
     public class myNotificationThread extends Thread {
         myNotificationThread(){
-            startNotification(getApplicationContext());
-            FirebaseHelper.getArrayList(getApplicationContext(),null);
+            //startNotification(getApplicationContext());
+            //FirebaseHelper.getArrayList(getApplicationContext(),null);
             //startNotification(getApplicationContext());
         }
     }
@@ -51,6 +51,5 @@ public class ShowNotificationJob extends JobService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        startNotification(getApplicationContext());
     }
 }

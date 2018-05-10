@@ -38,15 +38,12 @@ public class UserItems {
             mInstance = new UserItems();
         return mInstance;
     }
-
     private UserItems() {
         list = new ArrayList<String>();
         Boxes = new HashMap<String, User.Box>();
         thrownout = new ArrayList<String>();
         expiringlist=new ArrayList<String>();
     }
-
-
     public static void setUsername(String user){
         username = user;
     }
@@ -73,7 +70,6 @@ public class UserItems {
     public static void setBoxes(HashMap<String, User.Box> boxes) {
         Boxes = boxes;
     }
-
     public static void addToList(String itemName, Calendar dateExpires, Calendar dateAdded){
         SimpleDateFormat formatter = new SimpleDateFormat("yyy-MM-dd");
         Date dateExpiresTime = dateExpires.getTime();
@@ -90,14 +86,12 @@ public class UserItems {
     public static void addExpiringList(String item){
         expiringlist.add(item);
     }
-
     public static void addThrownout(String item) {
         thrownout.add(item);
     }
     public static void addBox (String key, User.Box box){
         Boxes.put(key,box);lastUpdate=lastUpdate+1;
     }
-
     public static void removeBox(String key){
         Boxes.remove(key);lastUpdate =lastUpdate+1;
     }
@@ -107,7 +101,6 @@ public class UserItems {
         if(Boxes.containsKey(box[0])){Boxes.remove(box[0]);}
         lastUpdate = lastUpdate+1;
     }
-
     public static void clearUser(){
         list=null; userid=null; username=null; lastUpdate=0;
         Boxes = null;

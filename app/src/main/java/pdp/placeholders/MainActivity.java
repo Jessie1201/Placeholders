@@ -60,8 +60,6 @@ public class MainActivity extends Activity {
         expSwitch = findViewById(R.id.switch1);
         yourfoodText = (TextView)findViewById(R.id.yourfoodTitle);
 
-        //ShowNotificationJob.startNotification(getApplicationContext());
-
         // Adds a button to the top part
         UserNameText =(TextView)findViewById(R.id.UserNameText);
         UserNameText.setText(UserItems.getUsername());
@@ -130,20 +128,6 @@ public class MainActivity extends Activity {
     }
 
     private void startNotification(Context context) {
-        /*Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.MINUTE,50);
-        cal.set(Calendar.HOUR_OF_DAY,11);
-        if(cal.before(Calendar.getInstance())){
-        //    cal.add(Calendar.HOUR,12);
-        }
-        Intent notintent = new Intent(this, ShowNotificationAlarm.class);
-        PendingIntent pendintent = PendingIntent.getBroadcast(this,0,notintent,PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager alarm = (AlarmManager)getSystemService(ALARM_SERVICE);
-        assert alarm != null;
-
-        // interval for alarm find alarm fix alarm
-        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP,cal.getTimeInMillis(),AlarmManager.INTERVAL_FIFTEEN_MINUTES/15,pendintent);
-        */
         ComponentName jobcomponent = new ComponentName(this,ShowNotificationJob.class);
         JobInfo.Builder jobInfo = new JobInfo.Builder(123123,jobcomponent);
         jobInfo.setPeriodic(TimeUnit.MINUTES.toMillis(1));
@@ -152,10 +136,6 @@ public class MainActivity extends Activity {
         JobInfo bultjob = jobInfo.build();
         JobScheduler jobScheduler = (JobScheduler)getSystemService(context.JOB_SCHEDULER_SERVICE);
         jobScheduler.schedule(bultjob);
-
-
-
-
 
     }
 
